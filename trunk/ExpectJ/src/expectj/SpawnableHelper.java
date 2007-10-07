@@ -12,6 +12,9 @@ import java.io.PipedOutputStream;
 class SpawnableHelper
 implements TimerEventListener 
 {
+    /**
+     * The spawnable we're wrapping.
+     */
     private Spawnable spawnable;
     
     /**
@@ -35,7 +38,7 @@ implements TimerEventListener
         this(runMe, -1);
     }
     
-    // Timer object to monitor our Spawnable
+    /** Timer object to monitor our Spawnable */
     private Timer tm = null;
 
     // Piped Streams to copy the output to standard streams

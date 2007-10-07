@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
  */
 public class ExpectJ {
 
-    // Default timeout, -1 indicating wait for indefinite time 
+    /** Default timeout, -1 indicating wait for indefinite time */
     private long m_lDefaultTimeOutSeconds = -1;
 
     /**

@@ -6,24 +6,31 @@ package expectj;
  */
 public class Timer implements Runnable
 {
-
-    // The time interval in milliseconds up to which the process 
-    // should be allowed to run.
+    /**
+     * The time interval in milliseconds up to which the process 
+     * should be allowed to run.
+     */
     private long timeOut = 0;
 
-    // Timer event Listener
+    /**
+     * The entity that wants to be notified on timeout.
+     */
     private TimerEventListener listener = null;
 
-    // Thread Object
+    /**
+     * The waiting thread.
+     */
     private Thread thread = null;
 
-    // Timer Status 
+    // Timer Status
     private static final int NOT_STARTED = 0;
     private static final int STARTED     = 1;
     private static final int TIMEDOUT    = 2;
     private static final int INTERRUPTED = 3;
   
-    // Stores the current status of Timer
+    /**
+     * Stores the current status of Timer
+     */
     private int currentStatus = NOT_STARTED;
    
     /**

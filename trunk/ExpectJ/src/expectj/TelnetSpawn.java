@@ -13,24 +13,40 @@ import java.net.UnknownHostException;
  */
 public class TelnetSpawn implements Spawnable
 {
-    private String m_remoteHostName;
+    /**
+     * A reference to the remote host.
+     */
     private InetAddress m_remoteHost;
+    
+    /**
+     * The port we're talking to on the remote host.
+     */
     private int m_remotePort;
+    
+    /**
+     * Our communications channel to the remote host.
+     */
     private Socket m_socket;
+    
+    /**
+     * Use this to read data from the remote host.
+     */
     private InputStream m_input;
+    
+    /**
+     * Use this to write data to the remote host.
+     */
     private OutputStream m_output;
     
     /**
      * Construct a new telnet spawn.
-     * @param remoteHost The remote host to connect to.
+     * @param remoteHostName The remote host to connect to.
      * @param remotePort The remote port to connect to.
      * @throws UnknownHostException If the name of the remote host cannot be looked up
      */
-    public TelnetSpawn(String remoteHost, int remotePort) throws UnknownHostException {
-        m_remoteHostName = remoteHost;
+    public TelnetSpawn(String remoteHostName, int remotePort) throws UnknownHostException {
         m_remotePort = remotePort;
-        
-        m_remoteHost = InetAddress.getByName(m_remoteHostName);
+        m_remoteHost = InetAddress.getByName(remoteHostName);
     }
     
     public void start()

@@ -14,7 +14,9 @@ import java.util.Date;
 class ProcessSpawn 
 implements Spawnable 
 {
-    // Process object
+    /**
+     * The spawned process.
+     */
     private ProcessThread processThread = null;
 
     private Debugger debug = new Debugger("ProcessSpawn", true);
@@ -125,6 +127,10 @@ implements Spawnable
          */
         private int exitValue;
         
+        /**
+         * Create a new process thread with the given command line.
+         * @param commandLine The process' command line.
+         */
         ProcessThread(String commandLine) {
             this.commandLine = commandLine;
         }

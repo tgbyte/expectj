@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class SpawnedProcess implements TimerEventListener {
 
-    // Default time out for expect commands
+    /** Default time out for expect commands */
     private long m_lDefaultTimeOutSeconds = -1;
 
     // Streams to the process
@@ -94,7 +94,7 @@ public class SpawnedProcess implements TimerEventListener {
     }
     /**
      * This method functions exactly like the Unix expect command. 
-     * It waits untill a string is read from the standard output stream 
+     * It waits until a string is read from the standard output stream 
      * of the spawned process that matches the string pattern. 
      * SpawnedProcess does a cases insensitive substring match for pattern 
      * against the output of the spawned process. 
@@ -108,7 +108,7 @@ public class SpawnedProcess implements TimerEventListener {
      * 
      * @param pattern The case-insensitive substring to match against.
      * @param lTimeOutSeconds The timeout in seconds before the match fails.
-     * @throws ExpectJException when some error occurrs.
+     * @throws ExpectJException when some error occurs.
      * @throws IOException on IO trouble waiting for pattern
      * @throws TimeoutException on timeout waiting for pattern
      */
@@ -179,6 +179,15 @@ public class SpawnedProcess implements TimerEventListener {
         expectClose(m_lDefaultTimeOutSeconds);
     }
     
+    /**
+     * Workhorse of the expect() and expectErr() methods.
+     * @see #expect(String, long)
+     * @param pattern What to look for
+     * @param lTimeOutSeconds How long to look before giving up
+     * @param readMe Where to look
+     * @throws IOException on IO trouble waiting for pattern
+     * @throws TimeoutException on timeout waiting for pattern
+     */
     private void expect(String pattern, long lTimeOutSeconds, InputStream readMe)
     throws ExpectJException, IOException, TimeoutException
     {
