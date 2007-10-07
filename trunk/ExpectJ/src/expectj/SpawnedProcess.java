@@ -18,9 +18,6 @@ public class SpawnedProcess implements TimerEventListener {
     /** Default time out for expect commands */
     private long m_lDefaultTimeOutSeconds = -1;
 
-    // Streams to the process
-    private InputStream inStream = null;
-    private InputStream errStream = null;
     private BufferedWriter out = null;
 
     // Debugger object
@@ -55,14 +52,12 @@ public class SpawnedProcess implements TimerEventListener {
         this.spawnHelper.start();
         debug.print("Spawned Process: " + spawn);               
         
-        inStream = spawnHelper.getInputStream();
-        errStream = spawnHelper.getErrorStream();
         out = new BufferedWriter(new OutputStreamWriter(spawnHelper.getOutputStream()));
     }
 
     /**
      * Timer callback method
-     * This method is invoked when the time-out occurr
+     * This method is invoked when the time-out occur
      */
     public synchronized void timerTimedOut() {
 
@@ -115,7 +110,7 @@ public class SpawnedProcess implements TimerEventListener {
     public void expect(String pattern, long lTimeOutSeconds)
     throws ExpectJException, IOException, TimeoutException
     {
-        expect(pattern, lTimeOutSeconds, inStream);
+        expect(pattern, lTimeOutSeconds, spawnHelper.getInputStream());
     }
     
     /**
@@ -209,7 +204,7 @@ public class SpawnedProcess implements TimerEventListener {
         here: while(continueReading) {
             // Sleeping if bytes are not available rather then
             // blocking
-            while (inStream.available() == 0 ) {
+            while (readMe.available() == 0 ) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -252,21 +247,21 @@ public class SpawnedProcess implements TimerEventListener {
      * @see #expect(String, long)
      * @param pattern The case-insensitive substring to match against.
      * @param lTimeOutSeconds The timeout in seconds before the match fails.
-     * @throws ExpectJException when some error occurrs.
+     * @throws ExpectJException when some error occurs.
      * @throws TimeoutException on timeout waiting for pattern
      * @throws IOException on IO trouble waiting for pattern
      */
     public void expectErr(String pattern, long lTimeOutSeconds)  
     throws ExpectJException, IOException, TimeoutException
     {
-        expect(pattern, lTimeOutSeconds, errStream);
+        expect(pattern, lTimeOutSeconds, spawnHelper.getErrorStream());
     }
 
     /**
      * This method functions exactly like expect described above, 
      * but uses the default timeout specified in the ExpectJ constructor. 
      * @param pattern The case-insensitive substring to match against.
-     * @throws ExpectJException when some error occurrs.
+     * @throws ExpectJException when some error occurs.
      * @throws TimeoutException on timeout waiting for pattern
      * @throws IOException on IO trouble waiting for pattern
      */
@@ -281,7 +276,7 @@ public class SpawnedProcess implements TimerEventListener {
      * function except for it tries to match the pattern with the output  
      * of standard error stream of the spawned process.
      * @param pattern The case-insensitive substring to match against.
-     * @throws ExpectJException when some error occurrs.
+     * @throws ExpectJException when some error occurs.
      * @throws TimeoutException on timeout waiting for pattern
      * @throws IOException on IO trouble waiting for pattern
      */
@@ -292,7 +287,7 @@ public class SpawnedProcess implements TimerEventListener {
     }
 
     /**
-     * This method shoud be use use to check the process status 
+     * This method should be use use to check the process status 
      * before invoking send()
      * @return true if the process has already exited. 
      */
@@ -356,7 +351,6 @@ public class SpawnedProcess implements TimerEventListener {
         if (interactErr != null)
             interactErr.stopProcessing();
         spawnHelper.stop();
-
     } 
 
     /**
