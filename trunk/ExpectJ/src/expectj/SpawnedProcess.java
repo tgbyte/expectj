@@ -3,8 +3,13 @@ package expectj;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.Pipe;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -14,7 +19,7 @@ import java.util.concurrent.TimeoutException;
  * @author	Sachin Shekar Shetty  
  */
 public class SpawnedProcess implements TimerEventListener {
-
+    
     /** Default time out for expect commands */
     private long m_lDefaultTimeOutSeconds = -1;
 
@@ -33,6 +38,16 @@ public class SpawnedProcess implements TimerEventListener {
     private StreamPiper interactErr = null;
     
     /**
+     * Wait for data from spawn's stdout.
+     */
+    private Selector stdoutSelector;
+    
+    /**
+     * Wait for data from spawn's stderr.
+     */
+    private Selector stderrSelector;
+    
+    /**
      * Constructor
      *
      * @param spawn This is what we'll control.
@@ -48,11 +63,18 @@ public class SpawnedProcess implements TimerEventListener {
         }
         m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;
         
-        this.spawnHelper = new SpawnableHelper(spawn, lDefaultTimeOutSeconds);
-        this.spawnHelper.start();
+        spawnHelper = new SpawnableHelper(spawn, lDefaultTimeOutSeconds);
+        spawnHelper.start();
         debug.print("Spawned Process: " + spawn);               
         
         out = new BufferedWriter(new OutputStreamWriter(spawnHelper.getOutputStream()));
+        
+        stdoutSelector = Selector.open();
+        spawnHelper.getSourceChannel().register(stdoutSelector, SelectionKey.OP_READ);
+        if (spawnHelper.getErrorSourceChannel() != null) {
+            stderrSelector = Selector.open();
+            spawnHelper.getErrorSourceChannel().register(stderrSelector, SelectionKey.OP_READ);
+        }
     }
 
     /**
@@ -60,9 +82,11 @@ public class SpawnedProcess implements TimerEventListener {
      * This method is invoked when the time-out occur
      */
     public synchronized void timerTimedOut() {
-
         continueReading = false;
-
+        stdoutSelector.wakeup();
+        if (stderrSelector != null) {
+            stderrSelector.wakeup();
+        }
     }
 
     /**
@@ -72,9 +96,11 @@ public class SpawnedProcess implements TimerEventListener {
      * @param reason Why we were interrupted
      */
     public void timerInterrupted(InterruptedException reason) {
-
         continueReading = false;
-
+        stdoutSelector.wakeup();
+        if (stderrSelector != null) {
+            stderrSelector.wakeup();
+        }
     } 
 
     /**
@@ -83,9 +109,7 @@ public class SpawnedProcess implements TimerEventListener {
      * the output of the process. 
      */
     public boolean isLastExpectTimeOut() {
-
-        return (!continueReading);
-
+        return !continueReading;
     }
     /**
      * This method functions exactly like the Unix expect command. 
@@ -110,7 +134,7 @@ public class SpawnedProcess implements TimerEventListener {
     public void expect(String pattern, long lTimeOutSeconds)
     throws ExpectJException, IOException, TimeoutException
     {
-        expect(pattern, lTimeOutSeconds, spawnHelper.getInputStream());
+        expect(pattern, lTimeOutSeconds, stdoutSelector);
     }
     
     /**
@@ -179,62 +203,74 @@ public class SpawnedProcess implements TimerEventListener {
      * @see #expect(String, long)
      * @param pattern What to look for
      * @param lTimeOutSeconds How long to look before giving up
-     * @param readMe Where to look
+     * @param selector A selector covering only the channel we should read from
      * @throws IOException on IO trouble waiting for pattern
      * @throws TimeoutException on timeout waiting for pattern
      */
-    private void expect(String pattern, long lTimeOutSeconds, InputStream readMe)
-    throws ExpectJException, IOException, TimeoutException
+    private void expect(String pattern, long lTimeOutSeconds, Selector selector)
+    throws IOException, TimeoutException
     {
         if (lTimeOutSeconds < -1) {
             throw new IllegalArgumentException("Timeout must be >= -1, was "
                                                + lTimeOutSeconds);
         }
         
-        debug.print("SpawnedProcess.expect(" + pattern + ")");               
-        Timer tm = null;
-        if (lTimeOutSeconds != -1 ) {
-            tm = new Timer(lTimeOutSeconds, this);
-            tm.startTimer();
+        if (selector.keys().size() != 1) {
+            throw new IllegalArgumentException("Selector key set size must be 1, was "
+                                               + selector.keys().size());
         }
+        // If this cast fails somebody gave us the wrong selector.
+        Pipe.SourceChannel readMe =
+            (Pipe.SourceChannel)selector.keys().iterator().next().channel();
+        
+        debug.print("SpawnedProcess.expect(" + pattern + ")");               
         continueReading = true;
         boolean found = false;
-        int i = 0;
-        StringBuffer line = new StringBuffer();
-        here: while(continueReading) {
-            // Sleeping if bytes are not available rather then
-            // blocking
-            while (readMe.available() == 0 ) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new ExpectJException("Interrupted waiting for pattern", e);
+        StringBuilder line = new StringBuilder();
+        Date runUntil = null;
+        if (lTimeOutSeconds > 0) {
+            runUntil = new Date(new Date().getTime() + lTimeOutSeconds * 1000);
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        while(continueReading) {
+            if (runUntil == null) {
+                selector.select();
+            } else {
+                long msLeft = runUntil.getTime() - new Date().getTime();
+                if (msLeft > 0) {
+                    selector.select(msLeft);
+                } else {
+                    continueReading = false;
+                    break;
                 }
-                // Go back and check the condition
-                continue here;
             }
-            i = readMe.read();
-            if (i== -1)
+            if (selector.selectedKeys().size() == 0) {
+                // Woke up with nothing selected, try again
+                continue;
+            }
+            
+            buffer.rewind();
+            if (readMe.read(buffer) == -1) {
+                // End of stream
                 break;
-            char ch = (char)i;
-            line.append(ch);
+            }
+            buffer.rewind();
+            for (int i = 0; i < buffer.limit(); i++) {
+                line.append((char)buffer.get(i));
+            }
             if (line.toString().trim().toUpperCase().indexOf(pattern.toUpperCase()) != -1) {
                 debug.print("Matched for " + pattern + ":" 
                             + line);
                 found = true;
                 break;
             }
-            if (i == '\n') {
-                debug.print("Line read: " + line);               
-                line.setLength(0);
+            while (line.indexOf("\n") != -1) {
+                line.delete(0, line.indexOf("\n") + 1);
             }
         }
         debug.print("expect Over");
         debug.print("Found: " + found);
         debug.print("Continue Reading:" + continueReading );
-        if (tm != null) {
-            debug.print("Timer Status:" + tm.getStatus());
-        }
         if (!continueReading) {
             throw new TimeoutException("Timeout trying to match \"" + pattern + "\"");
         }
@@ -254,7 +290,7 @@ public class SpawnedProcess implements TimerEventListener {
     public void expectErr(String pattern, long lTimeOutSeconds)  
     throws ExpectJException, IOException, TimeoutException
     {
-        expect(pattern, lTimeOutSeconds, spawnHelper.getErrorStream());
+        expect(pattern, lTimeOutSeconds, stderrSelector);
     }
 
     /**
@@ -331,10 +367,12 @@ public class SpawnedProcess implements TimerEventListener {
                                      System.in, spawnHelper.getOutputStream());
         interactIn.start();
         interactOut = new StreamPiper(null, 
-                                      spawnHelper.getInputStream(), System.out);
+                                      Channels.newInputStream(spawnHelper.getSourceChannel()),
+                                      System.out);
         interactOut.start();
         interactErr = new StreamPiper(null, 
-                                      spawnHelper.getErrorStream(), System.err);
+                                      Channels.newInputStream(spawnHelper.getErrorSourceChannel()),
+                                      System.err);
         interactErr.start();
         spawnHelper.stopPipingToStandardOut();
     }

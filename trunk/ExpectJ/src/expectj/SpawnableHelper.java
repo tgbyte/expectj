@@ -1,9 +1,8 @@
 package expectj;
 
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.Pipe;
 
 /**
  * Helper class that wraps Spawnables to make them crunchier for ExpectJ to run.
@@ -41,12 +40,15 @@ implements TimerEventListener
     /** Timer object to monitor our Spawnable */
     private Timer tm = null;
 
-    // Piped Streams to copy the output to standard streams
-    private PipedInputStream readSystemOut = null;
-    private PipedInputStream readSystemErr = null;
+    /**
+     * Handle spawn's stdout.
+     */
+    private Pipe systemOut;
 
-    private PipedOutputStream writeSystemOut = null;
-    private PipedOutputStream writeSystemErr = null;
+    /**
+     * Handle spawn's stderr.
+     */
+    private Pipe systemErr;
 
     // StreamPiper objects to pipe the output of one stream to other
     private StreamPiper spawnOutToSystemOut = null;
@@ -64,6 +66,10 @@ implements TimerEventListener
      * This method stops the spawn.
      */
     void stop() {
+        spawnOutToSystemOut.stopProcessing();
+        if (spawnErrToSystemErr != null) {
+            spawnErrToSystemErr.stopProcessing();
+        }
         spawnable.stop();
     }
 
@@ -111,27 +117,29 @@ implements TimerEventListener
             tm.startTimer();
         
         // Starting the piped streams and StreamPiper objects
-        readSystemOut = new PipedInputStream();
-        writeSystemOut = new PipedOutputStream(readSystemOut);
+        systemOut = Pipe.open();
+        systemOut.source().configureBlocking(false);
         spawnOutToSystemOut = new StreamPiper(System.out, 
-                                              spawnable.getInputStream(), writeSystemOut);
+                                              spawnable.getInputStream(),
+                                              Channels.newOutputStream(systemOut.sink()));
         spawnOutToSystemOut.start();
         
         if (spawnable.getErrorStream() != null) {
-            readSystemErr = new PipedInputStream();
-            writeSystemErr = new PipedOutputStream(readSystemErr);
+            systemErr = Pipe.open();
+            systemErr.source().configureBlocking(false);
+            
             spawnErrToSystemErr = new StreamPiper(System.err, 
                                                   spawnable.getErrorStream(),
-                                                  writeSystemErr);
+                                                  Channels.newOutputStream(systemErr.sink()));
             spawnErrToSystemErr.start();
         }
     }
 
     /**
-     * @return the input stream of the spawn.
+     * @return a channel from which data produced by the spawn can be read
      */
-    InputStream getInputStream() {
-        return readSystemOut;
+    Pipe.SourceChannel getSourceChannel() {
+        return systemOut.source();
     }
 
     /**
@@ -142,10 +150,14 @@ implements TimerEventListener
     }
 
     /**
-     * @return the error stream of the spawn.
+     * @return a channel from which stderr data produced by the spawn can be read, or
+     * null if there is no channel to stderr.
      */
-    InputStream getErrorStream() {
-        return readSystemErr;
+    Pipe.SourceChannel getErrorSourceChannel() {
+        if (systemErr == null) {
+            return null;
+        }
+        return systemErr.source();
     }
 
     /**

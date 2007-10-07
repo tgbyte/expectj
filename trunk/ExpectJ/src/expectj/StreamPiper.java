@@ -14,18 +14,32 @@ import java.io.PrintStream;
  */
 
 class StreamPiper extends Thread implements Runnable {
-
-    // Streams to read and write
+    
+    /**
+     * Read data from here.
+     */
     private InputStream pi = null;
+    
+    /**
+     * Write data to here.
+     */
     private OutputStream po = null;    
-    // Stream to copy the content
+    
+    /**
+     * Optionally send a copy of all piped data to here.
+     */
     private PrintStream copyStream = null;
    
-    // When true, StreamPiper does not copy the contents to Standard Out
+    /**
+     * When true we drop data from {@link #pi} rather than passing it to {@link #po}.
+     */
     volatile boolean stopPiping = false;
-
-    // To indicate stops processing the streams
-    volatile boolean continueProcessing = true;
+    
+    /**
+     * When this turns false, we shut down.  All accesses to this variable should be
+     * synchronized.
+     */
+    private boolean continueProcessing = true;
 
     // String Buffer to hold the contents of output and err
     private volatile StringBuffer sCurrentOut = new StringBuffer();
@@ -34,14 +48,11 @@ class StreamPiper extends Thread implements Runnable {
     private Debugger debug = new Debugger("StreamPiper", true);
     
     /**
-     * Constructor
-     *
      * @param copyStream Stream to copy the contents to before piping
      * the data to another stream. When this parameter is null, it does
      * not copy the contents
      * @param pi Input stream to read the data
      * @param po Output stream to write the data
-     * 
      */
     StreamPiper(PrintStream copyStream, InputStream pi, OutputStream po) {
         if (pi == null) {
@@ -59,24 +70,18 @@ class StreamPiper extends Thread implements Runnable {
      * This is used after interact.
      */
     public synchronized void stopPipingToStandardOut() {
-
         stopPiping = true;          
-
     }
 
     synchronized void startPipingToStandardOut() {
-
         stopPiping = false;          
-
     }
 
     /** 
      * This is used to stop the thread, after the process is killed
      */
     public synchronized void stopProcessing() {
-
-        continueProcessing = false;          
-
+        setContinueProcessing(false);          
     }
 
     /**
@@ -94,9 +99,8 @@ class StreamPiper extends Thread implements Runnable {
         int bytes_read;
 
         try {
-            while(continueProcessing) {
+            while(shouldContinueProcessing()) {
                 bytes_read = pi.read(buffer);
-                //bytes_read = pi.read();
                 if (bytes_read == -1) { 
                     debug.print("Closing Streams");
                     pi.close();
@@ -112,8 +116,29 @@ class StreamPiper extends Thread implements Runnable {
                 po.flush();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (shouldContinueProcessing()) {
+                // Got exception without having been asked to quit.  Whine.
+                e.printStackTrace();
+            }
         }
+    }
+
+    /**
+     * Set to false to terminate data shuffling.
+     * @param continueProcessing Whether or not to continue shuffling data.
+     */
+    private synchronized void setContinueProcessing(boolean continueProcessing)
+    {
+        this.continueProcessing = continueProcessing;
+    }
+
+    /**
+     * Are we still supposed to keep shuffling data?
+     * @return True if we should continue.  False otherwise.
+     */
+    private synchronized boolean shouldContinueProcessing()
+    {
+        return continueProcessing;
     }
 
 }
