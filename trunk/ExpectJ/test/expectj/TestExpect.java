@@ -1,5 +1,8 @@
 package expectj;
 
+import java.util.Date;
+import java.util.concurrent.TimeoutException;
+
 import junit.framework.TestCase;
 import expectj.test.StagedSpawnable;
 
@@ -23,13 +26,50 @@ public class TestExpect extends TestCase
     }
     
     /**
-     * Test that we can find a simple string.
+     * Test that we can find simple strings.
      * @throws Exception if things go wrong.
      */
-    public void testExpectString()
+    public void testExpectStrings()
     throws Exception
     {
-        SpawnedProcess testMe = getSpawnedProcess("flaska");
+        SpawnedProcess testMe = getSpawnedProcess("flaska", "gris");
         testMe.expect("flaska");
+        testMe.expect("gris");
+    }
+
+    /**
+     * Test that we can find simple strings with an unexpected string in between.
+     * @throws Exception if things go wrong.
+     */
+    public void testExpectStringsWithExtraData()
+    throws Exception
+    {
+        SpawnedProcess testMe = getSpawnedProcess("flaska", "nyckel", "gris");
+        testMe.expect("flaska");
+        testMe.expect("gris");
+    }
+    
+    /**
+     * Test that we time out properly when we don't find what we're looking for.
+     * @throws Exception if things go wrong.
+     */
+    public void testTimeout()
+    throws Exception 
+    {
+        // Test longer duration output than timeout
+        SpawnedProcess testMe = getSpawnedProcess("flaska", "nyckel", "gris", "hink");
+        Date beforeTimeout = new Date();
+        try {
+            testMe.expect("klubba", 1);
+            fail("Test should have timed out");
+        } catch (TimeoutException expected) {
+            // Ignoring expected exception
+        }
+        Date afterTimeout = new Date();
+        
+        long msElapsed = afterTimeout.getTime() - beforeTimeout.getTime();
+        if (msElapsed < 900 || msElapsed > 1100) {
+            fail("Should have timed out after 1s, timed out in " + msElapsed + "ms");
+        }
     }
 }
