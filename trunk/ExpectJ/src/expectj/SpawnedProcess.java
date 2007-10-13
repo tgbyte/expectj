@@ -23,12 +23,18 @@ public class SpawnedProcess implements TimerEventListener {
     /** Default time out for expect commands */
     private long m_lDefaultTimeOutSeconds = -1;
 
+    /**
+     * Buffered wrapper stream for slave's stdin.
+     */
     private BufferedWriter out = null;
 
     // Debugger object
     Debugger debug = new Debugger("SpawnedProcess", true);
 
-    private SpawnableHelper spawnHelper = null;
+    /**
+     * This is what we're actually talking to.
+     */
+    private SpawnableHelper slave = null;
 
     private volatile boolean continueReading = true;
 
@@ -63,20 +69,20 @@ public class SpawnedProcess implements TimerEventListener {
         }
         m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;
         
-        spawnHelper = new SpawnableHelper(spawn, lDefaultTimeOutSeconds);
-        spawnHelper.start();
+        slave = new SpawnableHelper(spawn, lDefaultTimeOutSeconds);
+        slave.start();
         debug.print("Spawned Process: " + spawn);               
         
-        if (spawnHelper.getOutputStream() != null) {
+        if (slave.getOutputStream() != null) {
             out =
-                new BufferedWriter(new OutputStreamWriter(spawnHelper.getOutputStream()));
+                new BufferedWriter(new OutputStreamWriter(slave.getOutputStream()));
         }
         
         stdoutSelector = Selector.open();
-        spawnHelper.getSourceChannel().register(stdoutSelector, SelectionKey.OP_READ);
-        if (spawnHelper.getErrorSourceChannel() != null) {
+        slave.getSourceChannel().register(stdoutSelector, SelectionKey.OP_READ);
+        if (slave.getErrorSourceChannel() != null) {
             stderrSelector = Selector.open();
-            spawnHelper.getErrorSourceChannel().register(stderrSelector, SelectionKey.OP_READ);
+            slave.getErrorSourceChannel().register(stderrSelector, SelectionKey.OP_READ);
         }
     }
 
@@ -166,7 +172,7 @@ public class SpawnedProcess implements TimerEventListener {
         boolean closed = false;
         while(continueReading) {
             // Sleep if process is still running
-            if(spawnHelper.isClosed()) {
+            if(slave.isClosed()) {
                 closed = true;
                 break;
             } else {
@@ -331,7 +337,7 @@ public class SpawnedProcess implements TimerEventListener {
      * @return true if the process has already exited. 
      */
     public boolean isClosed() {
-        return spawnHelper.isClosed();
+        return slave.isClosed();
     }
 
     /**
@@ -342,7 +348,7 @@ public class SpawnedProcess implements TimerEventListener {
     public int getExitValue()
     throws ExpectJException
     {
-        return spawnHelper.getExitValue();
+        return slave.getExitValue();
     }
 
     /**
@@ -367,17 +373,17 @@ public class SpawnedProcess implements TimerEventListener {
      */
     public void interact() {
         interactIn = new StreamPiper(null, 
-                                     System.in, spawnHelper.getOutputStream());
+                                     System.in, slave.getOutputStream());
         interactIn.start();
         interactOut = new StreamPiper(null, 
-                                      Channels.newInputStream(spawnHelper.getSourceChannel()),
+                                      Channels.newInputStream(slave.getSourceChannel()),
                                       System.out);
         interactOut.start();
         interactErr = new StreamPiper(null, 
-                                      Channels.newInputStream(spawnHelper.getErrorSourceChannel()),
+                                      Channels.newInputStream(slave.getErrorSourceChannel()),
                                       System.err);
         interactErr.start();
-        spawnHelper.stopPipingToStandardOut();
+        slave.stopPipingToStandardOut();
     }
 
     /**
@@ -391,20 +397,20 @@ public class SpawnedProcess implements TimerEventListener {
             interactOut.stopProcessing();
         if (interactErr != null)
             interactErr.stopProcessing();
-        spawnHelper.stop();
+        slave.stop();
     } 
 
     /**
      * @return the available contents of Standard Out
      */
     public String getCurrentStandardOutContents() {
-        return spawnHelper.getCurrentStandardOutContents();
+        return slave.getCurrentStandardOutContents();
     }
     
     /**
      * @return the available contents of Standard Err
      */
     public String getCurrentStandardErrContents() {
-        return spawnHelper.getCurrentStandardErrContents();
+        return slave.getCurrentStandardErrContents();
     }
 }
