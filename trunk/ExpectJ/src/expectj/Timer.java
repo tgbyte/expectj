@@ -22,11 +22,25 @@ public class Timer implements Runnable
      */
     private Thread thread = null;
 
-    // Timer Status
-    private static final int NOT_STARTED = 0;
-    private static final int STARTED     = 1;
-    private static final int TIMEDOUT    = 2;
-    private static final int INTERRUPTED = 3;
+    /**
+     * Timer not started.
+     */
+    public static final int NOT_STARTED = 0;
+    
+    /**
+     * Timer started and still running.
+     */
+    public static final int STARTED     = 1;
+    
+    /**
+     * Timer timed out.
+     */
+    public static final int TIMEDOUT    = 2;
+    
+    /**
+     * Timer interrupted.
+     */
+    public static final int INTERRUPTED = 3;
   
     /**
      * Stores the current status of Timer
@@ -66,11 +80,10 @@ public class Timer implements Runnable
     }
   
     /**
+     * Return timer status.  Can be one of {@link #NOT_STARTED}, {@link #STARTED},
+     * {@link #TIMEDOUT} or {@link #INTERRUPTED}.
+     * 
      * @return the status of the timer
-     *      NOT_STARTED = 0;
-     *      STARTED     = 1;
-     *      TIMEDOUT    = 2;
-     *      INTERRUPTED = 3;
      */
     public int getStatus() {
 
