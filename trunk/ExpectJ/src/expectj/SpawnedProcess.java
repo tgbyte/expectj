@@ -67,7 +67,10 @@ public class SpawnedProcess implements TimerEventListener {
         spawnHelper.start();
         debug.print("Spawned Process: " + spawn);               
         
-        out = new BufferedWriter(new OutputStreamWriter(spawnHelper.getOutputStream()));
+        if (spawnHelper.getOutputStream() != null) {
+            out =
+                new BufferedWriter(new OutputStreamWriter(spawnHelper.getOutputStream()));
+        }
         
         stdoutSelector = Selector.open();
         spawnHelper.getSourceChannel().register(stdoutSelector, SelectionKey.OP_READ);
