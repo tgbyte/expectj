@@ -50,6 +50,17 @@ public class TestExpect extends TestCase
     }
     
     /**
+     * Test that we get notified about closes.
+     * @throws Exception if things go wrong.
+     */
+    public void testExpectClose()
+    throws Exception
+    {
+        SpawnedProcess testMe = getSpawnedProcess("flaska", "gris");
+        testMe.expectClose();
+    }
+    
+    /**
      * Test that we time out properly when we don't find what we're looking for.
      * @throws Exception if things go wrong.
      */
@@ -57,11 +68,12 @@ public class TestExpect extends TestCase
     throws Exception 
     {
         // Test longer duration output than timeout
-        SpawnedProcess testMe = getSpawnedProcess("flaska", "nyckel", "gris", "hink");
+        SpawnedProcess testMe =
+            getSpawnedProcess("flaska", "nyckel", "gris", "hink", "bil", "stork");
         Date beforeTimeout = new Date();
         try {
             testMe.expect("klubba", 1);
-            fail("Test should have timed out");
+            fail("expect() should have timed out");
         } catch (TimeoutException expected) {
             // Ignoring expected exception
         }
@@ -69,7 +81,25 @@ public class TestExpect extends TestCase
         
         long msElapsed = afterTimeout.getTime() - beforeTimeout.getTime();
         if (msElapsed < 900 || msElapsed > 1100) {
-            fail("Should have timed out after 1s, timed out in " + msElapsed + "ms");
+            fail("expect() should have timed out after 1s, timed out in "
+                 + msElapsed
+                 + "ms");
+        }
+        
+        beforeTimeout = new Date();
+        try {
+            testMe.expectClose(1);
+            fail("expectClose() should have timed out");
+        } catch (TimeoutException expected) {
+            // Ignoring expected exception
+        }
+        afterTimeout = new Date();
+        
+        msElapsed = afterTimeout.getTime() - beforeTimeout.getTime();
+        if (msElapsed < 900 || msElapsed > 1100) {
+            fail("expectClose() should have timed out after 1s, timed out in "
+                 + msElapsed 
+                 + "ms");
         }
     }
 }
