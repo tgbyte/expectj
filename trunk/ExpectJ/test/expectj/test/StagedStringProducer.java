@@ -67,9 +67,11 @@ public class StagedStringProducer
                     } catch (InterruptedException e) {
                         // This exception intentionally ignored
                     }
-                    if (writeMe != null) {
-                        output.append(writeMe);
-                    }
+                }
+                justStarting = false;
+                
+                if (writeMe != null) {
+                    output.append(writeMe);
                 }
             }
             output.close();
