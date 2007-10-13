@@ -50,8 +50,14 @@ implements TimerEventListener
      */
     private Pipe systemErr;
 
-    // StreamPiper objects to pipe the output of one stream to other
+    /**
+     * Drive the pipe from spawn's stdout to {@link #systemOut}.
+     */
     private StreamPiper spawnOutToSystemOut = null;
+
+    /**
+     * Drive the pipe from spawn's stderr to {@link #systemErr}.
+     */
     private StreamPiper spawnErrToSystemErr = null;
     
     /**
@@ -86,8 +92,9 @@ implements TimerEventListener
     }
 
     /**
-     * This method is used to Stop all the piper object from copying the
-     * content to standard out. This is used after interact command.
+     * From now on, don't copy any piped content to stdout.
+     * @see #startPipingToStandardOut()
+     * @see SpawnedProcess#interact()
      */
     synchronized void stopPipingToStandardOut() {
         spawnOutToSystemOut.stopPipingToStandardOut();
@@ -96,6 +103,11 @@ implements TimerEventListener
         }
     }
 
+    /**
+     * From now on, copy all piped content to stdout.
+     * @see #stopPipingToStandardOut()
+     * @see SpawnedProcess#interact()
+     */
     synchronized void startPipingToStandardOut() {
         spawnOutToSystemOut.startPipingToStandardOut();          
         if (spawnErrToSystemErr != null) {
