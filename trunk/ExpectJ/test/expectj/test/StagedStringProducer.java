@@ -22,6 +22,11 @@ public class StagedStringProducer
     private PipedInputStream inputStream;
     
     /**
+     * The string producing thread.
+     */
+    private ProducerThread producerThread;
+    
+    /**
      * Thread that writes data to the pipe in stages.
      * @author johan.walles@gmail.com
      */
@@ -36,6 +41,11 @@ public class StagedStringProducer
          * Write strings to here.
          */
         OutputStream destination;
+        
+        /**
+         * Are we done?
+         */
+        private boolean done = false;
         
         /**
          * @param destination Where to write data to.
@@ -63,6 +73,24 @@ public class StagedStringProducer
                 }
             }
             output.close();
+            setDone();
+        }
+
+        /**
+         * Call this when we've written all data.
+         */
+        private synchronized void setDone()
+        {
+            this.done = true;
+        }
+
+        /**
+         * Are we done yet?
+         * @return true if we're done writing all data.  False otherwise.
+         */
+        public synchronized boolean isDone()
+        {
+            return done;
         }
     }
     
@@ -83,7 +111,8 @@ public class StagedStringProducer
     {
         this.inputStream = new PipedInputStream();
         OutputStream outputStream = new PipedOutputStream(this.inputStream);
-        new ProducerThread(outputStream, stringsToProduce).start();
+        this.producerThread = new ProducerThread(outputStream, stringsToProduce);
+        this.producerThread.start();
     }
     
     /**
@@ -91,5 +120,12 @@ public class StagedStringProducer
      */
     public InputStream getInputStream() {
         return this.inputStream;
+    }
+    
+    /**
+     * @return true if we have finished producing data.  False otherwise.
+     */
+    public boolean done() {
+        return this.producerThread.isDone();
     }
 }

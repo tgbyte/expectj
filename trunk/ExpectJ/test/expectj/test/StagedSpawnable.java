@@ -20,6 +20,11 @@ public class StagedSpawnable implements Spawnable
     private String produceUs[];
     
     /**
+     * We use this to produce strings.
+     */
+    private StagedStringProducer stringProducer;
+    
+    /**
      * Construct a staged string spawn.  The spawn will produce the requested strings
      * on its {@link #getInputStream()} stream.
      * <p>
@@ -30,8 +35,11 @@ public class StagedSpawnable implements Spawnable
      * @see #StagedSpawnable(String...)
      * @param stringsToProduce The strings to produce.
      */
-    public StagedSpawnable(String ... stringsToProduce) {
+    public StagedSpawnable(String ... stringsToProduce) 
+    throws IOException
+    {
         this.produceUs = stringsToProduce;
+        this.stringProducer = new StagedStringProducer(this.produceUs);
     }
     
     public void stop() {
@@ -43,7 +51,7 @@ public class StagedSpawnable implements Spawnable
     }
 
     public boolean isClosed() {
-        return false;
+        return stringProducer.done();
     }
 
     public OutputStream getOutputStream() {
@@ -51,11 +59,7 @@ public class StagedSpawnable implements Spawnable
     }
 
     public InputStream getInputStream() {
-        try {
-            return new StagedStringProducer(this.produceUs).getInputStream();
-        } catch (IOException e) {
-            return null;
-        }
+        return this.stringProducer.getInputStream();
     }
 
     public int getExitValue() throws ExpectJException {
