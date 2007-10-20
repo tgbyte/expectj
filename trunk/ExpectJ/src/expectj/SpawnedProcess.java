@@ -54,6 +54,11 @@ public class SpawnedProcess implements TimerEventListener {
     private Selector stderrSelector;
     
     /**
+     * This object will be notified on timer timeout.
+     */
+    private final Object timeoutNotification = new Object();
+    
+    /**
      * Constructor
      *
      * @param spawn This is what we'll control.
@@ -95,6 +100,9 @@ public class SpawnedProcess implements TimerEventListener {
         stdoutSelector.wakeup();
         if (stderrSelector != null) {
             stderrSelector.wakeup();
+        }
+        synchronized (timeoutNotification) {
+            timeoutNotification.notify();
         }
     }
 
@@ -170,17 +178,19 @@ public class SpawnedProcess implements TimerEventListener {
         }
         continueReading = true;
         boolean closed = false;
-        while(continueReading) {
-            // Sleep if process is still running
-            if(slave.isClosed()) {
-                closed = true;
-                break;
-            } else {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new ExpectJException("Interrupted waiting for spawn to finish",
-                                               e);
+        synchronized (timeoutNotification) {
+            while(continueReading) {
+                // Sleep if process is still running
+                if(slave.isClosed()) {
+                    closed = true;
+                    break;
+                } else {
+                    try {
+                        timeoutNotification.wait(500);
+                    } catch (InterruptedException e) {
+                        throw new ExpectJException("Interrupted waiting for spawn to finish",
+                                                   e);
+                    }
                 }
             }
         }
