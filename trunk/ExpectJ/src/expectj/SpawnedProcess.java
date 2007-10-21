@@ -29,7 +29,7 @@ public class SpawnedProcess implements TimerEventListener {
     private BufferedWriter out = null;
 
     // Debugger object
-    Debugger debug = new Debugger("SpawnedProcess", true);
+    Debugger debug = new Debugger(SpawnedProcess.class, true);
 
     /**
      * This is what we're actually talking to.

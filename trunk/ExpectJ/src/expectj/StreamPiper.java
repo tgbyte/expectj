@@ -45,7 +45,7 @@ class StreamPiper extends Thread implements Runnable {
     private volatile StringBuffer sCurrentOut = new StringBuffer();
 
     // Debugger
-    private Debugger debug = new Debugger("StreamPiper", true);
+    private Debugger debug = new Debugger(StreamPiper.class, true);
     
     /**
      * @param copyStream Stream to copy the contents to before piping

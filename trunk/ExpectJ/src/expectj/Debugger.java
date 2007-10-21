@@ -3,7 +3,7 @@ package expectj;
 import java.io.*;
 
 /**
- * This class is used for debugging, rather just to have a centalized 
+ * This class is used for debugging, rather just to have a centralized 
  * gateway to standard output and few more things.
  *
  * @author	Sachin Shekar Shetty  
@@ -11,33 +11,61 @@ import java.io.*;
 
 public class Debugger {
 
-	private final boolean DEBUG;
-	private static boolean  STATICDEBUG = false;
-	private final String CLASSNAME;
-	private static PrintStream outStream; 	
-	private static PrintWriter out = null;
-
-
     /**
+     * True if debugging is enabled for this class.  False otherwise.
+     */
+	private final boolean DEBUG;
+	
+	/**
+	 * True if debugging is enabled globally.  False otherwise.
+	 */
+	private static boolean  STATICDEBUG = false;
+	
+	/**
+	 * The name of the class to print debug messages for.
+	 */
+	private final String CLASSNAME;
+	
+	/**
+	 * Exception stack traces go here.
+	 */
+	private static PrintStream outStream; 	
+	
+	/**
+	 * Log messages go here.
+	 */
+	private static PrintWriter outWriter = null;
+
+
+	/**
+	 * Take a class and return its name without package information.
+	 * @param clazz The class to name.
+	 * @return The name of the class, without package information.
+	 */
+	static String classToName(Class<?> clazz) {
+	    return clazz.getSimpleName();
+	}
+	
+	/**
      * Constructor 
      * 
      * @param fileName Name of the log file.
-     * @param className Name of the class printing the debug
+     * @param sourceClass Name of the class printing the debug
      */ 
-    Debugger(String fileName, String className)  {
+    Debugger(String fileName, Class<?> sourceClass)  {
 
         System.out.println("Disributed Debugger is initailizing ;)  ....");
         STATICDEBUG = true;
         DEBUG = true;
-		CLASSNAME = className;
+		CLASSNAME = classToName(sourceClass);
 		try {
 			outStream = new PrintStream(new FileOutputStream(
                         fileName, true));
-			out = new PrintWriter(outStream, true);
-            out.println("");
-            out.println("*****Logger initialized at " + new java.util.Date() 
+			outWriter = new PrintWriter(outStream, true);
+            outWriter.println("");
+            outWriter.println("*****Logger initialized at " + new java.util.Date() 
                     + " *****");
-            out.println("");
+            outWriter.println("");
             System.out.println("Enterprise Log file located at: " + fileName);
 		}
 		catch (Exception exp) {
@@ -52,13 +80,13 @@ public class Debugger {
     /**
      * Constructor
      *
-     * @param className Name of the class printing the debug
+     * @param sourceClass The class printing the debug
      * @param DEBUG boolean to switch on/off debugging.
      */
-	Debugger(String className ,boolean DEBUG)  {
+	Debugger(Class<?> sourceClass ,boolean DEBUG)  {
 
 		this.DEBUG = DEBUG;
-		CLASSNAME = className;
+		CLASSNAME = classToName(sourceClass);
 
 	}
 
@@ -73,13 +101,13 @@ public class Debugger {
 	public void writeException(Exception exp) {
 
         if (DEBUG && STATICDEBUG) {
-            out.println("<message class='" + CLASSNAME + "' time-stamp='"
+            outWriter.println("<message class='" + CLASSNAME + "' time-stamp='"
                     + new java.util.Date() + "'>");
-            out.println("<exception>" + exp + "</exception>");
-            out.println("<stack-trace>");
+            outWriter.println("<exception>" + exp + "</exception>");
+            outWriter.println("<stack-trace>");
             exp.printStackTrace(outStream);
-            out.println("</stack-trace>");
-            out.println("</message>");
+            outWriter.println("</stack-trace>");
+            outWriter.println("</message>");
             outStream.flush();
 
         }
@@ -88,17 +116,17 @@ public class Debugger {
 
     /**
      * This method writes the string <code>msg</code> in to the log file
-     * is logging is enabled.
+     * if logging is enabled.
      * @param msg The message to write to the log file.
      */
 	public void print(String msg) {
         
         if (DEBUG && STATICDEBUG) {
-            out.println("<message class='" + CLASSNAME + "' time-stamp='"
+            outWriter.println("<message class='" + CLASSNAME + "' time-stamp='"
                     + new java.util.Date() + "'>");
-            out.println(msg); 
-            out.println("</message>");
-            out.flush();
+            outWriter.println(msg); 
+            outWriter.println("</message>");
+            outWriter.flush();
         }
 
 	}
@@ -106,7 +134,7 @@ public class Debugger {
 
 
     /**
-     * This method can be used for making stoping the execution witing
+     * This method can be used for making stopping the execution writing
      * for a line feed.
      */
 	void waitHere() {
@@ -114,7 +142,7 @@ public class Debugger {
 		try {
 			System.in.read();
 		}
-		catch (IOException  ie) {
+		catch (IOException ie) {
 			System.err.println("DEBUGGER:Failed while waiting for input " + ie);
 		}
 

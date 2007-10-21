@@ -21,7 +21,7 @@ public class ExpectJ {
      */
     public ExpectJ(String sLogFile, long lDefaultTimeOutSeconds) {
         if (sLogFile != null) {
-            new Debugger(sLogFile, "JExpect");
+            new Debugger(sLogFile, ExpectJ.class);
         }
         
         m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;                

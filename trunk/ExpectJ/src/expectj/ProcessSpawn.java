@@ -19,7 +19,7 @@ implements Spawnable
      */
     private ProcessThread processThread = null;
 
-    private Debugger debug = new Debugger("ProcessSpawn", true);
+    private Debugger debug = new Debugger(ProcessSpawn.class, true);
     
     /**
      * This constructor allows to run a process with indefinate time-out
