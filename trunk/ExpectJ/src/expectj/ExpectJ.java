@@ -28,6 +28,13 @@ public class ExpectJ {
     }
 
     /**
+     * Create a new ExpectJ with no logging and infinite timeout.
+     */
+    public ExpectJ() {
+        this(null, -1);
+    }
+    
+    /**
      * This method spawns a spawnable and returns a object representing
      * the SpawnedProcess. Further expect commands can be invoked on the
      * SpawnedProcess Object. 
