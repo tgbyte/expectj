@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @author	Sachin Shekar Shetty  
  */
-public class SpawnedProcess implements TimerEventListener {
+public class SpawnedProcess {
     
     /** Default time out for expect commands */
     private long m_lDefaultTimeOutSeconds = -1;
@@ -95,7 +95,7 @@ public class SpawnedProcess implements TimerEventListener {
      * Timer callback method
      * This method is invoked when the time-out occur
      */
-    public synchronized void timerTimedOut() {
+    private synchronized void timerTimedOut() {
         continueReading = false;
         stdoutSelector.wakeup();
         if (stderrSelector != null) {
@@ -112,12 +112,8 @@ public class SpawnedProcess implements TimerEventListener {
      * receives an interrupted exception
      * @param reason Why we were interrupted
      */
-    public void timerInterrupted(InterruptedException reason) {
-        continueReading = false;
-        stdoutSelector.wakeup();
-        if (stderrSelector != null) {
-            stderrSelector.wakeup();
-        }
+    private void timerInterrupted(InterruptedException reason) {
+        timerTimedOut();
     } 
 
     /**
@@ -172,7 +168,15 @@ public class SpawnedProcess implements TimerEventListener {
         debug.print("SpawnedProcess.expectClose()");
         Timer tm = null;
         if (lTimeOutSeconds != -1 ) {
-            tm = new Timer(lTimeOutSeconds, this);
+            tm = new Timer(lTimeOutSeconds, new TimerEventListener() {
+                public void timerTimedOut() {
+                    SpawnedProcess.this.timerTimedOut();
+                }
+            
+                public void timerInterrupted(InterruptedException reason) {
+                    SpawnedProcess.this.timerInterrupted(reason);
+                }
+            });
             tm.startTimer();
         }
         continueReading = true;
