@@ -4,7 +4,7 @@ package expectj;
 /**
  * This class acts like a timer and invokes the listener on time-out.
  */
-public class Timer implements Runnable
+class Timer implements Runnable
 {
     /**
      * The time interval in milliseconds up to which the process 

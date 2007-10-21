@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
  * A Spawnable for controlling a telnet session using ExpectJ.
  * @author Johan Walles
  */
-public class TelnetSpawn implements Spawnable
+class TelnetSpawn implements Spawnable
 {
     /**
      * A reference to the remote host.

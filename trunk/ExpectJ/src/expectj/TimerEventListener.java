@@ -3,8 +3,7 @@ package expectj;
 /**
  * This interface represents the events triggered by Timer class
  */
-
-public interface TimerEventListener {
+interface TimerEventListener {
     /**
      * This method represents the time-out event triggered by Timer.
      */
