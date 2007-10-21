@@ -51,16 +51,15 @@ public class StagedStringProducer
          * @param destination Where to write data to.
          * @param stringsToWrite The data to write.
          */
-        public ProducerThread(OutputStream destination, String ... stringsToWrite) {
+        public ProducerThread(OutputStream destination, String stringsToWrite[]) {
             this.destination = destination;
             this.writeUs = stringsToWrite;
         }
         
-        @Override
         public void run() {
             PrintStream output = new PrintStream(this.destination);
             boolean justStarting = true;
-            for (String writeMe: writeUs) {
+            for (int i = 0; i < writeUs.length ; i++) {
                 if (!justStarting) {
                     try {
                         Thread.sleep(500);
@@ -70,6 +69,7 @@ public class StagedStringProducer
                 }
                 justStarting = false;
                 
+                String writeMe = writeUs[i];
                 if (writeMe != null) {
                     output.append(writeMe);
                 }
@@ -108,7 +108,7 @@ public class StagedStringProducer
      * @param stringsToProduce The strings to produce.
      * @exception IOException If an IO error occurs.
      */
-    public StagedStringProducer(String ... stringsToProduce)
+    public StagedStringProducer(String stringsToProduce[])
     throws IOException
     {
         this.inputStream = new PipedInputStream();

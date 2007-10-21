@@ -19,7 +19,7 @@ public class TestExpect extends TestCase
      * @return A new SpawnedProcess.
      * @throws Exception when things go wrong.
      */
-    private SpawnedProcess getSpawnedProcess(final String ... strings)
+    private SpawnedProcess getSpawnedProcess(String strings[])
     throws Exception
     {
         return new ExpectJ(null, -1).spawn(new StagedSpawnable(strings));
@@ -32,7 +32,7 @@ public class TestExpect extends TestCase
     public void testExpectStrings()
     throws Exception
     {
-        SpawnedProcess testMe = getSpawnedProcess("flaska", "gris");
+        SpawnedProcess testMe = getSpawnedProcess(new String[] {"flaska", "gris"});
         testMe.expect("flaska");
         testMe.expect("gris");
     }
@@ -44,7 +44,8 @@ public class TestExpect extends TestCase
     public void testExpectStringsWithExtraData()
     throws Exception
     {
-        SpawnedProcess testMe = getSpawnedProcess("flaska", "nyckel", "gris");
+        SpawnedProcess testMe =
+            getSpawnedProcess(new String[] {"flaska", "nyckel", "gris"});
         testMe.expect("flaska");
         testMe.expect("gris");
     }
@@ -56,7 +57,7 @@ public class TestExpect extends TestCase
     public void testExpectClose()
     throws Exception
     {
-        SpawnedProcess testMe = getSpawnedProcess("flaska", "gris");
+        SpawnedProcess testMe = getSpawnedProcess(new String[] {"flaska", "gris"});
         testMe.expectClose();
     }
     
@@ -69,7 +70,7 @@ public class TestExpect extends TestCase
     {
         // Test longer duration output than timeout
         SpawnedProcess testMe =
-            getSpawnedProcess("flaska", "nyckel", "gris", "hink", "bil", "stork");
+            getSpawnedProcess(new String[] {"flaska", "nyckel", "gris", "hink", "bil", "stork"});
         Date beforeTimeout = new Date();
         try {
             testMe.expect("klubba", 1);
@@ -87,7 +88,7 @@ public class TestExpect extends TestCase
         }
         
         testMe =
-            getSpawnedProcess("flaska", "nyckel", "gris", "hink", "bil", "stork");
+            getSpawnedProcess(new String[] {"flaska", "nyckel", "gris", "hink", "bil", "stork"});
         beforeTimeout = new Date();
         try {
             testMe.expectClose(1);

@@ -35,7 +35,7 @@ public class StagedSpawnable implements Spawnable
      * @see #StagedSpawnable(String...)
      * @param stringsToProduce The strings to produce.
      */
-    public StagedSpawnable(String ... stringsToProduce) 
+    public StagedSpawnable(String stringsToProduce[]) 
     throws IOException
     {
         this.produceUs = stringsToProduce;

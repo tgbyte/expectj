@@ -42,7 +42,7 @@ public class Debugger {
 	 * @param clazz The class to name.
 	 * @return The name of the class, without package information.
 	 */
-	static String classToName(Class<?> clazz) {
+	static String classToName(Class clazz) {
 	    return clazz.getSimpleName();
 	}
 	
@@ -52,7 +52,7 @@ public class Debugger {
      * @param fileName Name of the log file.
      * @param sourceClass Name of the class printing the debug
      */ 
-    Debugger(String fileName, Class<?> sourceClass)  {
+    Debugger(String fileName, Class sourceClass)  {
 
         System.out.println("Disributed Debugger is initailizing ;)  ....");
         STATICDEBUG = true;
@@ -83,7 +83,7 @@ public class Debugger {
      * @param sourceClass The class printing the debug
      * @param DEBUG boolean to switch on/off debugging.
      */
-	Debugger(Class<?> sourceClass ,boolean DEBUG)  {
+	Debugger(Class sourceClass ,boolean DEBUG)  {
 
 		this.DEBUG = DEBUG;
 		CLASSNAME = classToName(sourceClass);

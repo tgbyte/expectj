@@ -240,7 +240,7 @@ public class SpawnedProcess implements TimerEventListener {
         }
         // If this cast fails somebody gave us the wrong selector.
         Pipe.SourceChannel readMe =
-            (Pipe.SourceChannel)selector.keys().iterator().next().channel();
+            (Pipe.SourceChannel)((SelectionKey)(selector.keys().iterator().next())).channel();
         
         debug.print("SpawnedProcess.expect(" + pattern + ")");               
         continueReading = true;
