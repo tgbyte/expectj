@@ -14,7 +14,7 @@ public class ExpectJ {
     private long m_lDefaultTimeOutSeconds = -1;
 
     /**
-     * @param sLogFile Location of the log file
+     * @param sLogFile Location of the log file, or null for no logging
      * @param lDefaultTimeOutSeconds default time out in seconds for the expect commands
      * on the spawned process.  -1 default time out indicates indefinite
      * timeout
