@@ -86,6 +86,8 @@ public class TestExpect extends TestCase
                  + "ms");
         }
         
+        testMe =
+            getSpawnedProcess("flaska", "nyckel", "gris", "hink", "bil", "stork");
         beforeTimeout = new Date();
         try {
             testMe.expectClose(1);
