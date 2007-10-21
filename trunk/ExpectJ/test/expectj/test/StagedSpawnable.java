@@ -26,7 +26,7 @@ public class StagedSpawnable implements Spawnable
     
     /**
      * Construct a staged string spawn.  The spawn will produce the requested strings
-     * on its {@link #getInputStream()} stream.
+     * on its {@link #getStdout()} stream.
      * <p>
      * Strings will be produced with a 500ms delay between each.  There will be no delay
      * before the first or after the last one.  A null entry means "don't create any
@@ -54,19 +54,19 @@ public class StagedSpawnable implements Spawnable
         return stringProducer.done();
     }
 
-    public OutputStream getOutputStream() {
+    public OutputStream getStdin() {
         return null;
     }
 
-    public InputStream getInputStream() {
-        return this.stringProducer.getInputStream();
+    public InputStream getStdout() {
+        return this.stringProducer.getStringStream();
     }
 
     public int getExitValue() throws ExpectJException {
         return 0;
     }
 
-    public InputStream getErrorStream() {
+    public InputStream getStderr() {
         return null;
     }
 }

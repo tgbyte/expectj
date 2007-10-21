@@ -31,12 +31,12 @@ public class TelnetSpawn implements Spawnable
     /**
      * Use this to read data from the remote host.
      */
-    private InputStream m_input;
+    private InputStream m_fromSocket;
     
     /**
      * Use this to write data to the remote host.
      */
-    private OutputStream m_output;
+    private OutputStream m_toSocket;
     
     /**
      * Construct a new telnet spawn.
@@ -53,19 +53,19 @@ public class TelnetSpawn implements Spawnable
     throws IOException
     {
         m_socket = new Socket(m_remoteHost, m_remotePort);
-        m_input = m_socket.getInputStream();
-        m_output = m_socket.getOutputStream();
+        m_fromSocket = m_socket.getInputStream();
+        m_toSocket = m_socket.getOutputStream();
     }
 
-    public InputStream getInputStream() {
-        return m_input;
+    public InputStream getStdout() {
+        return m_fromSocket;
     }
 
-    public OutputStream getOutputStream() {
-        return m_output;
+    public OutputStream getStdin() {
+        return m_toSocket;
     }
 
-    public InputStream getErrorStream()
+    public InputStream getStderr()
     {
         return null;
     }
@@ -95,7 +95,7 @@ public class TelnetSpawn implements Spawnable
             // Failure: When your best just isn't good enough.
         }
         m_socket = null;
-        m_input = null;
-        m_output = null;
+        m_fromSocket = null;
+        m_toSocket = null;
     }
 }

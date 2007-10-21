@@ -56,21 +56,21 @@ implements Spawnable
     /**
      * @return the input stream of the process.
      */
-    public InputStream getInputStream() {
+    public InputStream getStdout() {
         return processThread.process.getInputStream();
     }
 
     /**
      * @return the output stream of the process.
      */
-    public OutputStream getOutputStream() {
+    public OutputStream getStdin() {
         return processThread.process.getOutputStream();
     }
 
     /**
      * @return the error stream of the process.
      */
-    public InputStream getErrorStream() {
+    public InputStream getStderr() {
         return processThread.process.getErrorStream();
     }
 

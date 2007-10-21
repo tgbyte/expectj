@@ -132,16 +132,16 @@ implements TimerEventListener
         systemOut = Pipe.open();
         systemOut.source().configureBlocking(false);
         spawnOutToSystemOut = new StreamPiper(System.out, 
-                                              spawnable.getInputStream(),
+                                              spawnable.getStdout(),
                                               Channels.newOutputStream(systemOut.sink()));
         spawnOutToSystemOut.start();
         
-        if (spawnable.getErrorStream() != null) {
+        if (spawnable.getStderr() != null) {
             systemErr = Pipe.open();
             systemErr.source().configureBlocking(false);
             
             spawnErrToSystemErr = new StreamPiper(System.err, 
-                                                  spawnable.getErrorStream(),
+                                                  spawnable.getStderr(),
                                                   Channels.newOutputStream(systemErr.sink()));
             spawnErrToSystemErr.start();
         }
@@ -150,22 +150,22 @@ implements TimerEventListener
     /**
      * @return a channel from which data produced by the spawn can be read
      */
-    Pipe.SourceChannel getSourceChannel() {
+    Pipe.SourceChannel getStdoutChannel() {
         return systemOut.source();
     }
 
     /**
      * @return the output stream of the spawn.
      */
-    OutputStream getOutputStream() {
-        return spawnable.getOutputStream();
+    OutputStream getStdin() {
+        return spawnable.getStdin();
     }
 
     /**
      * @return a channel from which stderr data produced by the spawn can be read, or
      * null if there is no channel to stderr.
      */
-    Pipe.SourceChannel getErrorSourceChannel() {
+    Pipe.SourceChannel getStderrChannel() {
         if (systemErr == null) {
             return null;
         }

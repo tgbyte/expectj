@@ -103,7 +103,7 @@ public class StagedStringProducer
      * before the first or after the last one.  A null entry means "don't create any
      * string here".
      * <p>
-     * Strings can be read from the {@link #getInputStream()} stream.
+     * Strings can be read from the {@link #getStringStream()} stream.
      * 
      * @param stringsToProduce The strings to produce.
      * @exception IOException If an IO error occurs.
@@ -120,7 +120,7 @@ public class StagedStringProducer
     /**
      * @return A reference to the stream on which we'll produce data.
      */
-    public InputStream getInputStream() {
+    public InputStream getStringStream() {
         return this.inputStream;
     }
     

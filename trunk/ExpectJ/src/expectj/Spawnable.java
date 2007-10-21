@@ -21,20 +21,20 @@ public interface Spawnable
      * @return A stream that represents stdout of a spawned process.
      * @see Process#getInputStream()
      */
-    InputStream getInputStream();
+    InputStream getStdout();
     
     /**
      * @return A stream that represents stdin of a spawned process.
      * @see Process#getOutputStream()
      */
-    OutputStream getOutputStream();
+    OutputStream getStdin();
     
     /**
      * @return A stream that represents stderr of a spawned process, or null if there is
      * no stderr.
      * @see Process#getErrorStream()
      */
-    InputStream getErrorStream();
+    InputStream getStderr();
     
     /**
      * @return true if a spawned process has finished.
