@@ -22,7 +22,7 @@ public class TestExpect extends TestCase
     private SpawnedProcess getSpawnedProcess(final String ... strings)
     throws Exception
     {
-        return new ExpectJ("/dev/null", -1).spawn(new StagedSpawnable(strings));
+        return new ExpectJ(null, -1).spawn(new StagedSpawnable(strings));
     }
     
     /**
