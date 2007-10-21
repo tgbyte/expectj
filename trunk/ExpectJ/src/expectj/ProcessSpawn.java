@@ -22,31 +22,18 @@ implements Spawnable
     private Debugger debug = new Debugger(ProcessSpawn.class, true);
     
     /**
-     * This constructor allows to run a process with indefinate time-out
-     * @param commandLine process command to be executed 
+     * This constructor allows to run a process with indefinite time-out
+     * @param executor Will be called upon to create the new process
      */
-    ProcessSpawn (String commandLine) {
-        if (commandLine == null || commandLine.trim().equals("")) {
-            throw new IllegalArgumentException("Command is null/empty");
+    ProcessSpawn (Executor executor) {
+        if (executor == null) {
+            throw new NullPointerException("Executor is null, must get something to run");
         }
 
         // Initialise the process thread.
-        processThread = new ProcessThread(commandLine);
+        processThread = new ProcessThread(executor);
     }
 
-    /**
-     * This constructor allows to run a process with indefinate time-out
-     * @param commandLine process command to be executed 
-     */
-    ProcessSpawn (String commandLine[]) {
-        if (commandLine == null || commandLine.length == 0) {
-            throw new IllegalArgumentException("Command is null/empty");
-        }
-
-        // Initialise the process thread.
-        processThread = new ProcessThread(commandLine);
-    }
-    
     /**
      * This method stops the spawned process.
      */
@@ -116,16 +103,6 @@ implements Spawnable
      */
     class ProcessThread implements Runnable {
         /**
-         * The command to be executed
-         */
-        private String commandLineString = null;
-
-        /**
-         * The command to be executed
-         */
-        private String commandLineArray[] = null;
-        
-        /**
          * Process object for execution of the commandLine
          */
         private Process process = null;
@@ -146,28 +123,19 @@ implements Spawnable
         private int exitValue;
         
         /**
-         * Create a new process thread with the given command line.
-         * @param commandLine The process' command line.
+         * This is what we use to create our process.
          */
-        ProcessThread(String commandLine) {
-            if (commandLine == null) {
-                throw new NullPointerException("Command line must not be null");
-            }
-            this.commandLineString = commandLine;
-        }
-
+        private Executor executor;
+        
         /**
-         * Create a new process thread with the given command line.
-         * @param commandLine The process' command line.
+         * Prepare for starting a process through the given executor.
+         * <p>
+         * Call {@link #start()} to actually start running the process.
+         * 
+         * @param executor Will be called upon to start the new process.
          */
-        ProcessThread(String commandLine[]) {
-            if (commandLine == null) {
-                throw new NullPointerException("Command line must not be null");
-            }
-            if (commandLine.length == 0) {
-                throw new IllegalArgumentException("Command line must not be empty");
-            }
-            this.commandLineArray = commandLine;
+        public ProcessThread(Executor executor) {
+            this.executor = executor;
         }
         
         /**
@@ -178,11 +146,7 @@ implements Spawnable
         public void start() throws IOException {
             debug.print("Process Started at:" + new Date());
             thread = new Thread(this); 
-            if (commandLineString != null) {
-                process = Runtime.getRuntime().exec(commandLineString);
-            } else {
-                process = Runtime.getRuntime().exec(commandLineArray);
-            }
+            process = executor.execute();
             thread.start();
         }
 
@@ -203,13 +167,7 @@ implements Spawnable
          * This method interrupts and stops the thread.
          */
         public void stop() {
-            String processDescription;
-            if (commandLineString != null) {
-                processDescription = commandLineString;
-            } else {
-                processDescription = commandLineArray[0];
-            }
-            debug.print("Process '" + processDescription + "' Killed at:" 
+            debug.print("Process '" + executor + "' Killed at:" 
                     + new Date());
             process.destroy();
             thread.interrupt();

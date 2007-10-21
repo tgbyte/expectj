@@ -1,6 +1,7 @@
 package expectj;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 
@@ -62,8 +63,18 @@ public class ExpectJ {
      * @throws Exception if the process spawning fails
      * @see Runtime#exec(String)
      */
-    public SpawnedProcess spawn(String sCommand) throws Exception {
-        return spawn(new ProcessSpawn(sCommand));
+    public SpawnedProcess spawn(final String sCommand) throws Exception {
+        return spawn(new ProcessSpawn(new Executor() {
+            public Process execute() 
+            throws IOException
+            {
+                return Runtime.getRuntime().exec(sCommand);
+            }
+            
+            public String toString() {
+                return sCommand;
+            }
+        }));
     }
 
     /**
@@ -71,13 +82,15 @@ public class ExpectJ {
      * the SpawnedProcess. Further expect commands can be invoked on the
      * SpawnedProcess Object. 
      *
-     * @param sCommandLine command to be executed
+     * @param executor Will be called upon to start the new process
      * @return The newly spawned process
      * @throws Exception if the process spawning fails
      * @see Runtime#exec(String[])
      */
-    public SpawnedProcess spawn(String sCommandLine[]) throws Exception {
-        return spawn(new ProcessSpawn(sCommandLine));
+    public SpawnedProcess spawn(Executor executor)
+    throws Exception
+    {
+        return spawn(new ProcessSpawn(executor));
     }
     
     /**
