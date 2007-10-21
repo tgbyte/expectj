@@ -48,9 +48,24 @@ public class ExpectJ {
      * @param sCommand command to be executed
      * @return The newly spawned process
      * @throws Exception if the process spawning fails
+     * @see Runtime#exec(String)
      */
     public SpawnedProcess spawn(String sCommand) throws Exception {
         return spawn(new ProcessSpawn(sCommand));
+    }
+
+    /**
+     * This method spawns a process and returns a object representing
+     * the SpawnedProcess. Further expect commands can be invoked on the
+     * SpawnedProcess Object. 
+     *
+     * @param sCommandLine command to be executed
+     * @return The newly spawned process
+     * @throws Exception if the process spawning fails
+     * @see Runtime#exec(String[])
+     */
+    public SpawnedProcess spawn(String sCommandLine[]) throws Exception {
+        return spawn(new ProcessSpawn(sCommandLine));
     }
     
     /**

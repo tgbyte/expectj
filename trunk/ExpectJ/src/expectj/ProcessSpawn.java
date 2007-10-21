@@ -35,6 +35,19 @@ implements Spawnable
     }
 
     /**
+     * This constructor allows to run a process with indefinate time-out
+     * @param commandLine process command to be executed 
+     */
+    ProcessSpawn (String commandLine[]) {
+        if (commandLine == null || commandLine.length == 0) {
+            throw new IllegalArgumentException("Command is null/empty");
+        }
+
+        // Initialise the process thread.
+        processThread = new ProcessThread(commandLine);
+    }
+    
+    /**
      * This method stops the spawned process.
      */
     public void stop() {
@@ -105,8 +118,13 @@ implements Spawnable
         /**
          * The command to be executed
          */
-        private String commandLine = null;
+        private String commandLineString = null;
 
+        /**
+         * The command to be executed
+         */
+        private String commandLineArray[] = null;
+        
         /**
          * Process object for execution of the commandLine
          */
@@ -132,9 +150,26 @@ implements Spawnable
          * @param commandLine The process' command line.
          */
         ProcessThread(String commandLine) {
-            this.commandLine = commandLine;
+            if (commandLine == null) {
+                throw new NullPointerException("Command line must not be null");
+            }
+            this.commandLineString = commandLine;
         }
 
+        /**
+         * Create a new process thread with the given command line.
+         * @param commandLine The process' command line.
+         */
+        ProcessThread(String commandLine[]) {
+            if (commandLine == null) {
+                throw new NullPointerException("Command line must not be null");
+            }
+            if (commandLine.length == 0) {
+                throw new IllegalArgumentException("Command line must not be empty");
+            }
+            this.commandLineArray = commandLine;
+        }
+        
         /**
          * This method spawns the thread and runs the process within the
          * thread
@@ -143,7 +178,11 @@ implements Spawnable
         public void start() throws IOException {
             debug.print("Process Started at:" + new Date());
             thread = new Thread(this); 
-            process = Runtime.getRuntime().exec(commandLine);
+            if (commandLineString != null) {
+                process = Runtime.getRuntime().exec(commandLineString);
+            } else {
+                process = Runtime.getRuntime().exec(commandLineArray);
+            }
             thread.start();
         }
 
@@ -164,7 +203,13 @@ implements Spawnable
          * This method interrupts and stops the thread.
          */
         public void stop() {
-            debug.print("Process '" + commandLine + "' Killed at:" 
+            String processDescription;
+            if (commandLineString != null) {
+                processDescription = commandLineString;
+            } else {
+                processDescription = commandLineArray[0];
+            }
+            debug.print("Process '" + processDescription + "' Killed at:" 
                     + new Date());
             process.destroy();
             thread.interrupt();
