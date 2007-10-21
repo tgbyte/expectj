@@ -1,6 +1,7 @@
 package expectj;
 
 import java.io.*;
+import java.util.Date;
 
 /**
  * This class is used for debugging, rather just to have a centralized 
@@ -8,9 +9,7 @@ import java.io.*;
  *
  * @author	Sachin Shekar Shetty  
  */
-
-public class Debugger {
-
+class Debugger {
     /**
      * True if debugging is enabled for this class.  False otherwise.
      */
@@ -27,14 +26,9 @@ public class Debugger {
 	private final String CLASSNAME;
 	
 	/**
-	 * Exception stack traces go here.
-	 */
-	private static PrintStream outStream; 	
-	
-	/**
 	 * Log messages go here.
 	 */
-	private static PrintWriter outWriter = null;
+	private static PrintWriter output = null;
 
 
 	/**
@@ -49,32 +43,20 @@ public class Debugger {
 	/**
      * Constructor 
      * 
-     * @param fileName Name of the log file.
+     * @param output Where log messages will be written to
      * @param sourceClass Name of the class printing the debug
      */ 
-    Debugger(String fileName, Class sourceClass)  {
+    Debugger(PrintWriter output, Class sourceClass)  {
 
         System.out.println("Disributed Debugger is initailizing ;)  ....");
         STATICDEBUG = true;
         DEBUG = true;
 		CLASSNAME = classToName(sourceClass);
-		try {
-			outStream = new PrintStream(new FileOutputStream(
-                        fileName, true));
-			outWriter = new PrintWriter(outStream, true);
-            outWriter.println("");
-            outWriter.println("*****Logger initialized at " + new java.util.Date() 
-                    + " *****");
-            outWriter.println("");
-            System.out.println("Enterprise Log file located at: " + fileName);
-		}
-		catch (Exception exp) {
-			System.err.println("Could not open log file:" + fileName);
-			System.err.println("Exception: " + exp);
-            System.err.println("No Messages will be logged");
-            STATICDEBUG = false;
-		}
 
+		Debugger.output = output;
+		output.println("");
+		output.println("*****Logger initialized at " + new Date() + " *****");
+		output.println("");
     }
 
     /**
@@ -83,7 +65,7 @@ public class Debugger {
      * @param sourceClass The class printing the debug
      * @param DEBUG boolean to switch on/off debugging.
      */
-	Debugger(Class sourceClass ,boolean DEBUG)  {
+	Debugger(Class sourceClass, boolean DEBUG)  {
 
 		this.DEBUG = DEBUG;
 		CLASSNAME = classToName(sourceClass);
@@ -101,15 +83,14 @@ public class Debugger {
 	public void writeException(Exception exp) {
 
         if (DEBUG && STATICDEBUG) {
-            outWriter.println("<message class='" + CLASSNAME + "' time-stamp='"
+            output.println("<message class='" + CLASSNAME + "' time-stamp='"
                     + new java.util.Date() + "'>");
-            outWriter.println("<exception>" + exp + "</exception>");
-            outWriter.println("<stack-trace>");
-            exp.printStackTrace(outStream);
-            outWriter.println("</stack-trace>");
-            outWriter.println("</message>");
-            outStream.flush();
-
+            output.println("<exception>" + exp + "</exception>");
+            output.println("<stack-trace>");
+            exp.printStackTrace(output);
+            output.println("</stack-trace>");
+            output.println("</message>");
+            output.flush();
         }
 
 	}
@@ -122,11 +103,11 @@ public class Debugger {
 	public void print(String msg) {
         
         if (DEBUG && STATICDEBUG) {
-            outWriter.println("<message class='" + CLASSNAME + "' time-stamp='"
+            output.println("<message class='" + CLASSNAME + "' time-stamp='"
                     + new java.util.Date() + "'>");
-            outWriter.println(msg); 
-            outWriter.println("</message>");
-            outWriter.flush();
+            output.println(msg); 
+            output.println("</message>");
+            output.flush();
         }
 
 	}

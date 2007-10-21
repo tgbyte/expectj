@@ -1,5 +1,7 @@
 package expectj;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.net.UnknownHostException;
 
 /**
@@ -18,10 +20,13 @@ public class ExpectJ {
      * @param lDefaultTimeOutSeconds default time out in seconds for the expect commands
      * on the spawned process.  -1 default time out indicates indefinite
      * timeout
+     * @throws FileNotFoundException if the log file cannot be created
      */
-    public ExpectJ(String sLogFile, long lDefaultTimeOutSeconds) {
+    public ExpectJ(String sLogFile, long lDefaultTimeOutSeconds) 
+    throws FileNotFoundException
+    {
         if (sLogFile != null) {
-            new Debugger(sLogFile, ExpectJ.class);
+            new Debugger(new PrintWriter(sLogFile), ExpectJ.class);
         }
         
         m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;                
@@ -31,7 +36,7 @@ public class ExpectJ {
      * Create a new ExpectJ with no logging and infinite timeout.
      */
     public ExpectJ() {
-        this(null, -1);
+        // This constructor intentionally left blank
     }
     
     /**
