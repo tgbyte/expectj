@@ -27,12 +27,29 @@ public class ExpectJ {
     throws FileNotFoundException
     {
         if (sLogFile != null) {
-            new Debugger(new PrintWriter(sLogFile), ExpectJ.class);
+            Debugger.initialize(new PrintWriter(sLogFile));
         }
         
         m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;                
     }
 
+    /**
+     * @param logWriter Log messages will be written to here, or null for no logging
+     * @param lDefaultTimeOutSeconds default time out in seconds for the expect commands
+     * on the spawned process.  -1 default time out indicates indefinite
+     * timeout
+     * @throws FileNotFoundException if the log file cannot be created
+     */
+    public ExpectJ(PrintWriter logWriter, long lDefaultTimeOutSeconds) 
+    throws FileNotFoundException
+    {
+        if (logWriter != null) {
+            Debugger.initialize(logWriter);
+        }
+        
+        m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;                
+    }
+    
     /**
      * Create a new ExpectJ with no logging and infinite timeout.
      */

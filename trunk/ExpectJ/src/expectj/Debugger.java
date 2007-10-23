@@ -41,22 +41,19 @@ class Debugger {
 	}
 	
 	/**
-     * Constructor 
+     * Globally enable logging.
      * 
-     * @param output Where log messages will be written to
-     * @param sourceClass Name of the class printing the debug
+     * @param logDestination Where log messages will be written to
      */ 
-    Debugger(PrintWriter output, Class sourceClass)  {
+    static void initialize(PrintWriter logDestination)  {
 
         System.out.println("Disributed Debugger is initailizing ;)  ....");
         STATICDEBUG = true;
-        DEBUG = true;
-		CLASSNAME = classToName(sourceClass);
 
-		Debugger.output = output;
-		output.println("");
-		output.println("*****Logger initialized at " + new Date() + " *****");
-		output.println("");
+		Debugger.output = logDestination;
+		logDestination.println("");
+		logDestination.println("*****Logger initialized at " + new Date() + " *****");
+		logDestination.println("");
     }
 
     /**
