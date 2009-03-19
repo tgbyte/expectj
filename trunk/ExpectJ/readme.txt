@@ -1,6 +1,6 @@
                                    README
 
-                                  ExpectJ         
+                                  ExpectJ
                                 Version 1.0
 
 
@@ -11,15 +11,15 @@ Contents
     * Features expected in future releases
     * System Requirements
     * User Documentation
-    * Source (not for people with object oriented MIND-SET and  
+    * Source (not for people with object oriented MIND-SET and
            don't want to peek into a closed box component)
-    * Java Doc               
+    * Java Doc
     * About the Author
-    
-    
 
 
-Introduction   
+
+
+Introduction
 
      Thank you for downloading this release of     ExpectJ 1.1.
      ExpectJ is a ready to use java version of Unix expect utility.
@@ -30,41 +30,45 @@ Introduction
      but soon you will get used to the confusion.
 
 
-Installation    
+Installation
 
-     Unzip the downloaded file. I guess you have already done it, other wise 
-     you would not be reading this README.txt. 
-     You just need to put $EXTRACT_DIR/classes.jar file 
-     in your class path and you are ready to write code accessing 
+     Unzip the downloaded file. I guess you have already done it, other wise
+     you would not be reading this README.txt.
+     You just need to put $EXTRACT_DIR/classes.jar file
+     in your class path and you are ready to write code accessing
      the ExpectJ API.
-     For more information on how to use it, refer to User Documentation. 
+     For more information on how to use it, refer to User Documentation.
 
 
-        
+
 Features expected in future releases
-     
-     Need to go through the Expect man page; I know there are plenty 
-     to implement, let me know when you want a particular feature 
-     though I don't guarantee that I will oblige.
-     
 
-System Requirements 
-    
-    * JDK 1.3 or higher. 
-        
+     Need to go through the Expect man page; I know there are plenty
+     to implement, let me know when you want a particular feature
+     though I don't guarantee that I will oblige.
+
+
+System Requirements
+
+    * JDK 1.3 or higher.
+
 User Documentation
 
-    * $EXTRACT_DIR/doc/ 
-    
-Source 
-    
+    * $EXTRACT_DIR/doc/
+
+Source
+
     * $EXTRACT_DIR/src
 
 Java Doc
-    
+
     * $EXTRACT_DIR/javadoc
 
 About the Author
-   
+
     * Search the google for "Sachin Shekar Shetty". Google ko sab malum hai :))\
     * Email at sachintheonly@yahoo.com
+
+License
+    * ExpectJ is released under the GNU LGPL 2.1 license, see the
+     LICENSE file for information.
