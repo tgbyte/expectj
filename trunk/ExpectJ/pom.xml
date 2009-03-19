@@ -16,6 +16,12 @@
     </dependency>
   </dependencies>
 
+  <!-- We're using SVN services from Sourceforge -->
+  <scm>
+    <developerConnection>scm:svn:https://expectj.svn.sourceforge.net/svnroot/expectj/trunk/ExpectJ</developerConnection>
+    <url>http://expectj.svn.sourceforge.net/</url>
+  </scm>
+
   <build>
     <!-- We have sources in non-standard locations -->
     <sourceDirectory>src</sourceDirectory>
@@ -30,6 +36,61 @@
           <source>1.4</source>
           <target>1.4</target>
         </configuration>
+      </plugin>
+
+      <plugin>
+	<!--
+	    Attempt to fetch sources and javadoc by default when
+	    generating Eclipse project files.
+	  -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs>
+        </configuration>
+      </plugin>
+
+      <plugin>
+	<!-- Put the SVN revision number in the ${buildNumber} property -->
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>buildnumber-maven-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <phase>validate</phase>
+	    <goals>
+              <goal>create</goal>
+	    </goals>
+	  </execution>
+	</executions>
+	<configuration>
+	  <!-- Don't look for uncommitted changes before running -->
+	  <doCheck>false</doCheck>
+
+	  <!-- Don't check for upstream changes before doing anything -->
+	  <doUpdate>false</doUpdate>
+	</configuration>
+      </plugin>
+
+      <plugin>
+	<!-- Create a JAR file -->
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-jar-plugin</artifactId>
+	<configuration>
+	  <!-- Put the SVN revision number in the JAR file name -->
+	  <finalName>${project.artifactId}-${project.version}-r${buildNumber}</finalName>
+
+          <archive>
+            <manifest>
+	      <!-- Put version information in the JAR file's Manifest -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+	      <!-- Put the SVN revision number in the JAR file's Manifest -->
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+            </manifestEntries>
+          </archive>
+	</configuration>
       </plugin>
     </plugins>
   </build>
