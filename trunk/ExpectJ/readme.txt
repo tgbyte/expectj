@@ -60,6 +60,9 @@ Source
 
     * $EXTRACT_DIR/src
 
+    Note that if you want an Eclipse project for ExpectJ, Maven will
+    generate one for you using "mvn eclipse:eclipse".
+
 Java Doc
 
     * $EXTRACT_DIR/javadoc
