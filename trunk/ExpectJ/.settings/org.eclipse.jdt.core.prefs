@@ -1,4 +1,4 @@
-#Thu Mar 19 07:46:48 GMT+01:00 2009
+#Fri Mar 20 07:09:20 GMT+01:00 2009
 eclipse.preferences.version=1
 instance/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
@@ -39,6 +39,7 @@ org.eclipse.jdt.core.compiler.problem.missingDeprecatedAnnotation=ignore
 org.eclipse.jdt.core.compiler.problem.missingJavadocComments=warning
 org.eclipse.jdt.core.compiler.problem.missingJavadocCommentsOverriding=disabled
 org.eclipse.jdt.core.compiler.problem.missingJavadocCommentsVisibility=private
+org.eclipse.jdt.core.compiler.problem.missingJavadocTagDescription=all_standard_tags
 org.eclipse.jdt.core.compiler.problem.missingJavadocTags=warning
 org.eclipse.jdt.core.compiler.problem.missingJavadocTagsOverriding=disabled
 org.eclipse.jdt.core.compiler.problem.missingJavadocTagsVisibility=private

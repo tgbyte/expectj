@@ -3,7 +3,8 @@ package expectj;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class spawns a process that ExpectJ can control. 
@@ -15,12 +16,15 @@ class ProcessSpawn
 implements Spawnable 
 {
     /**
+     * Log messages go here.
+     */
+    private final static Log LOG = LogFactory.getLog(ProcessSpawn.class);
+    
+    /**
      * The spawned process.
      */
     private ProcessThread processThread = null;
 
-    private Debugger debug = new Debugger(ProcessSpawn.class, true);
-    
     /**
      * This constructor allows to run a process with indefinite time-out
      * @param executor Will be called upon to create the new process
@@ -144,7 +148,7 @@ implements Spawnable
          * @throws IOException if process spawning fails
          */
         public void start() throws IOException {
-            debug.print("Process Started at:" + new Date());
+            LOG.debug("Starting process '" + executor + "'");
             thread = new Thread(this); 
             process = executor.execute();
             thread.start();
@@ -167,8 +171,7 @@ implements Spawnable
          * This method interrupts and stops the thread.
          */
         public void stop() {
-            debug.print("Process '" + executor + "' Killed at:" 
-                    + new Date());
+            LOG.debug("Process '" + executor + "' killed");
             process.destroy();
             thread.interrupt();
         }

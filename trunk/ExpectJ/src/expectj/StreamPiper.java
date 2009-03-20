@@ -5,36 +5,43 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This class is responsible for piping the output of one stream to the
  * other. Optionally it also copies the content to standard out or
  * standard err
  *
- * @author	Sachin Shekar Shetty  
+ * @author	Sachin Shekar Shetty
  */
 
 class StreamPiper extends Thread implements Runnable {
-    
+    /**
+     * Log messages go here.
+     */
+    private final static Log LOG = LogFactory.getLog(StreamPiper.class);
+
     /**
      * Read data from here.
      */
     private InputStream pi = null;
-    
+
     /**
      * Write data to here.
      */
-    private OutputStream po = null;    
-    
+    private OutputStream po = null;
+
     /**
      * Optionally send a copy of all piped data to here.
      */
     private PrintStream copyStream = null;
-   
+
     /**
      * When true we drop data from {@link #pi} rather than passing it to {@link #po}.
      */
     volatile boolean stopPiping = false;
-    
+
     /**
      * When this turns false, we shut down.  All accesses to this variable should be
      * synchronized.
@@ -44,9 +51,6 @@ class StreamPiper extends Thread implements Runnable {
     // String Buffer to hold the contents of output and err
     private volatile StringBuffer sCurrentOut = new StringBuffer();
 
-    // Debugger
-    private Debugger debug = new Debugger(StreamPiper.class, true);
-    
     /**
      * @param copyStream Stream to copy the contents to before piping
      * the data to another stream. When this parameter is null, it does
@@ -70,18 +74,18 @@ class StreamPiper extends Thread implements Runnable {
      * This is used after interact.
      */
     public synchronized void stopPipingToStandardOut() {
-        stopPiping = true;          
+        stopPiping = true;
     }
 
     synchronized void startPipingToStandardOut() {
-        stopPiping = false;          
+        stopPiping = false;
     }
 
-    /** 
+    /**
      * This is used to stop the thread, after the process is killed
      */
     public synchronized void stopProcessing() {
-        setContinueProcessing(false);          
+        setContinueProcessing(false);
     }
 
     /**
@@ -101,11 +105,11 @@ class StreamPiper extends Thread implements Runnable {
         try {
             while(shouldContinueProcessing()) {
                 bytes_read = pi.read(buffer);
-                if (bytes_read == -1) { 
-                    debug.print("Closing Streams");
+                if (bytes_read == -1) {
+                    LOG.debug("Stream ended, closing");
                     pi.close();
                     po.close();
-                    return; 
+                    return;
                 }
                 po.write(buffer, 0, bytes_read);
                 sCurrentOut.append(new String(buffer, 0, bytes_read));
