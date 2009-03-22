@@ -6,7 +6,11 @@
   <packaging>jar</packaging>
   <version>2.0-SNAPSHOT</version>
   <name>ExpectJ</name>
-  <url>http://maven.apache.org</url>
+  <description>ExpectJ is a Java re-implementation of the venerable
+  TCL Expect utility. It can be used to script interaction with either
+  a process (through stdin / stdout) or a telnet
+  session.</description>
+  <url>http://expectj.sourceforge.net</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -21,11 +25,88 @@
     </dependency>
   </dependencies>
 
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License 2.1</name>
+      <url>http://www.gnu.org/licenses/lgpl-2.1.html#SEC1</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <!-- We are using issue tracking services from Sourceforge -->
+  <issueManagement>
+    <system>Sourceforge</system>
+    <url>http://sourceforge.net/tracker/?group_id=98171</url>
+  </issueManagement>
+
   <!-- We're using SVN services from Sourceforge -->
   <scm>
     <developerConnection>scm:svn:https://expectj.svn.sourceforge.net/svnroot/expectj/trunk/ExpectJ</developerConnection>
     <url>http://expectj.svn.sourceforge.net/</url>
   </scm>
+
+  <developers>
+    <developer>
+      <name>Sachin Shekar Shetty</name>
+      <email>sachintheonly@yahoo.com</email>
+      <roles>
+        <role>Project Founder, no longer active</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Johan Walles</name>
+      <email>johan.walles@gmail.com</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+	      <report>summary</report>
+              <report>license</report>
+              <report>scm</report>
+              <report>dependencies</report>
+              <report>issue-tracking</report>
+              <report>project-team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+	<!-- Add javadoc to web site -->
+        <artifactId>maven-javadoc-plugin</artifactId>
+	<reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+              <!-- <report>test-javadoc</report> -->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+	<!-- Add cross-referenced source code to web site -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+	<!-- Add unit test results to the web site -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <build>
     <!-- We have sources in non-standard locations -->
@@ -139,5 +220,10 @@
       <uniqueVersion>false</uniqueVersion>
       <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2snapshot</url>
     </snapshotRepository>
+
+    <site>
+      <id>website</id>
+      <url>file:///tmp/expectj-site</url>
+    </site>
   </distributionManagement>
 </project>
