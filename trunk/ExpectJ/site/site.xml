@@ -4,12 +4,12 @@
     <links>
       <item name="Expect" href="http://expect.nist.gov/" />
       <item name="Sourceforge Project" href="http://sourceforge.net/projects/expectj"/>
-      <item name="Source cross reference" href="xref/index.html"/>
     </links>
 
     <menu name="ExpectJ">
       <item name="Introduction" href="index.html"/>
       <item name="Javadoc" href="apidocs/index.html"/>
+      <item name="Source cross reference" href="xref/index.html"/>
       <item name="Sourceforge Project" href="http://sourceforge.net/projects/expectj"/>
     </menu>
 

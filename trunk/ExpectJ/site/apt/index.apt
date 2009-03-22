@@ -1,14 +1,57 @@
 ~~ Emacs, this is a -*-text-*- file
- ExpectJ is a Java implementation of
- {{{http://expect.nist.gov/}the Unix expect utility}}. ExpectJ
- provides a Unix expect like support to write Java Programs that
- communicate with other programs and perform some operation on them.
+ ExpectJ is a Java implementation of {{{http://expect.nist.gov/}the
+ Unix expect utility}}. It can be used for automating interaction with
+ either a process (through stdin / stdout) or a telnet session.
 
- If you are not familiar with working of the Unix expect utility,
- please refer to man page of expect. Usage of ExpectJ requires a
- proper understanding of the Unix expect utility. sdfafdsa fdsa fd
+Basic usage
 
- For example using ExpectJ you can write a Java program that telnets
- to a host machine and deletes the contents of /tmp. This program when
- configured as a cron job will always keep the /tmp under the
- specified limit.
+ The following snippet can be used for running a short
+ shell session. Try putting something like it in a unit test for
+ example:
+
++-------------------------------+
+// Create a new ExpectJ object with a timeout of 5s
+ExpectJ expectinator = new ExpectJ(5);
+
+// Fork the process
+Spawn shell = expectinator.spawn("/bin/sh");
+
+// Talk to it
+shell.send("echo Chunder\n");
+shell.expect("Chunder");
+shell.send("exit\n");
+shell.expectClose();
+
+// Done!
++-------------------------------+
+
+ On timeout a TimeoutException will be thrown.
+
+ More usage information is in the {{{apidocs/index.html}javadocs}}.
+
+Downloading
+
+ Don't. Use {{{http://maven.apache.org}Maven}}. Put the following
+ dependency in your pom.xml:
+
++-------------------------------+
+<project ...>
+  <dependencies>
+    <dependency>
+      <groupId>net.sourceforge.expectj</groupId>
+      <artifactId>ExpectJ</artifactId>
+
+      <!-- Optional scope: Use ExpectJ for (unit) tests only -->
+      <scope>test</scope>
+    </dependency>
+    ...
+  </dependencies>
+  ...
+</project>
++-------------------------------+
+
+Licensing
+
+ ExpectJ is released under the
+ {{{http://www.gnu.org/licenses/lgpl-2.1.html#SEC1}GNU Lesser General
+ Public License 2.1}}.
