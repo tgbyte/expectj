@@ -72,7 +72,11 @@
 	  <!-- Don't look for uncommitted changes before running -->
 	  <doCheck>false</doCheck>
 
-	  <!-- Check for upstream changes before doing anything -->
+	  <!--
+	      Check for upstream changes before doing anything. This
+	      fixes problems with getting outdated revision numbers
+	      after svn commits.
+	    -->
 	  <doUpdate>true</doUpdate>
 	</configuration>
       </plugin>
@@ -103,6 +107,22 @@
     </plugins>
   </build>
 
+  <!--
+      To deploy stuff to Sourceforge, you must:
+
+      1. Put the following in your ~/.m2/settings.xml:
+
+        <servers>
+	  <server>
+	    <id>expectj</id>
+	    <username>yoursourceforgeusernamegoeshere,expectj</username>
+	  </server>
+	</servers>
+
+      2. ssh yoursourceforgeusernamegoeshere,expectj@shell.sf.net create
+
+      3. mvn deploy
+    -->
   <distributionManagement>
     <!-- Deploy releases to http://expectj.sf.net/m2repo -->
     <repository>
