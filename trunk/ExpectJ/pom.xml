@@ -72,8 +72,8 @@
 	  <!-- Don't look for uncommitted changes before running -->
 	  <doCheck>false</doCheck>
 
-	  <!-- Don't check for upstream changes before doing anything -->
-	  <doUpdate>false</doUpdate>
+	  <!-- Check for upstream changes before doing anything -->
+	  <doUpdate>true</doUpdate>
 	</configuration>
       </plugin>
 
@@ -103,18 +103,20 @@
     </plugins>
   </build>
 
-  <!-- Deploy to a repository at Sourceforge -->
   <distributionManagement>
+    <!-- Deploy releases to http://expectj.sf.net/m2repo -->
     <repository>
       <id>expectj</id>
       <name>ExpectJ Sourceforge Repository</name>
       <uniqueVersion>false</uniqueVersion>
       <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2repo</url>
     </repository>
+
+    <!-- Deploy snapshots to http://expectj.sf.net/m2snapshot -->
     <snapshotRepository>
       <id>expectj</id>
       <name>ExpectJ Sourceforge Snapshot Repository</name>
-      <uniqueVersion>true</uniqueVersion>
+      <uniqueVersion>false</uniqueVersion>
       <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2snapshot</url>
     </snapshotRepository>
   </distributionManagement>
