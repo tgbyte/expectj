@@ -7,19 +7,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This class spawns a process that ExpectJ can control. 
+ * This class spawns a process that ExpectJ can control.
  *
- * @author Sachin Shekar Shetty  
+ * @author Sachin Shekar Shetty
  * @author Johan Walles
  */
-class ProcessSpawn 
-implements Spawnable 
+class ProcessSpawn
+implements Spawnable
 {
     /**
      * Log messages go here.
      */
     private final static Log LOG = LogFactory.getLog(ProcessSpawn.class);
-    
+
     /**
      * The spawned process.
      */
@@ -92,7 +92,7 @@ implements Spawnable
      * @return The exit code of the finished process.
      * @throws ExpectJException if the process is still running.
      */
-    public int getExitValue() 
+    public int getExitValue()
     throws ExpectJException
     {
         if (!isClosed()) {
@@ -105,13 +105,13 @@ implements Spawnable
      * This class is responsible for executing the process in a seperate
      * thread.
      */
-    class ProcessThread implements Runnable {
+    static class ProcessThread implements Runnable {
         /**
          * Process object for execution of the commandLine
          */
         private Process process = null;
 
-        /** 
+        /**
          * Thread object to run this file
          */
         private Thread thread = null;
@@ -125,23 +125,23 @@ implements Spawnable
          * The exit value of the process if it is done executing
          */
         private int exitValue;
-        
+
         /**
          * This is what we use to create our process.
          */
         private Executor executor;
-        
+
         /**
          * Prepare for starting a process through the given executor.
          * <p>
          * Call {@link #start()} to actually start running the process.
-         * 
+         *
          * @param executor Will be called upon to start the new process.
          */
         public ProcessThread(Executor executor) {
             this.executor = executor;
         }
-        
+
         /**
          * This method spawns the thread and runs the process within the
          * thread
@@ -149,7 +149,7 @@ implements Spawnable
          */
         public void start() throws IOException {
             LOG.debug("Starting process '" + executor + "'");
-            thread = new Thread(this); 
+            thread = new Thread(this);
             process = executor.execute();
             thread.start();
         }
@@ -163,8 +163,8 @@ implements Spawnable
                 exitValue = process.exitValue();
                 isClosed = true;
             } catch (Exception e) {
-                e.printStackTrace(); 
-            } 
+                LOG.error("Failed waiting for process termination", e);
+            }
         }
 
         /**

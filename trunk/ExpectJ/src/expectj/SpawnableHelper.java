@@ -4,18 +4,26 @@ import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Helper class that wraps Spawnables to make them crunchier for ExpectJ to run.
  * @author Johan Walles
  */
 class SpawnableHelper
-implements TimerEventListener 
+implements TimerEventListener
 {
+    /**
+     * Log messages go here.
+     */
+    private final static Log LOG = LogFactory.getLog(SpawnableHelper.class);
+
     /**
      * The spawnable we're wrapping.
      */
     private Spawnable spawnable;
-    
+
     /**
      * @param timeOutSeconds time interval in seconds to be allowed for spawn execution
      * @param runMe the spawnable to execute
@@ -29,14 +37,14 @@ implements TimerEventListener
         }
         this.spawnable = runMe;
     }
-    
+
     /**
      * @param runMe the spawnable to execute
      */
     SpawnableHelper(Spawnable runMe) {
         this(runMe, -1);
     }
-    
+
     /** Timer object to monitor our Spawnable */
     private Timer tm = null;
 
@@ -59,7 +67,7 @@ implements TimerEventListener
      * Drive the pipe from spawn's stderr to {@link #systemErr}.
      */
     private StreamPiper spawnErrToSystemErr = null;
-    
+
     /**
      * Time callback method
      * This method is invoked when the time-out occurr
@@ -80,15 +88,14 @@ implements TimerEventListener
     }
 
     /**
-     * Timer callback method
-     * This method is invoked by the Timer, when the timer thread
+     * This method is invoked by the {@link Timer}, when the timer thread
      * receives an interrupted exception.
      * @param reason The reason we were interrupted.
      */
     public void timerInterrupted(InterruptedException reason) {
-        // Print the stack trace and ignore the problem, this will make us never time
-        // out.  Too bad.  /JW-2006apr10
-        reason.printStackTrace();
+        // Print the stack trace and ignore the problem, this will make us never
+        // time out.  Too bad.  /JW-2006apr10
+        LOG.error("Timer interrupted", reason);
     }
 
     /**
@@ -109,7 +116,7 @@ implements TimerEventListener
      * @see SpawnedProcess#interact()
      */
     synchronized void startPipingToStandardOut() {
-        spawnOutToSystemOut.startPipingToStandardOut();          
+        spawnOutToSystemOut.startPipingToStandardOut();
         if (spawnErrToSystemErr != null) {
             spawnErrToSystemErr.startPipingToStandardOut();
         }
@@ -121,26 +128,27 @@ implements TimerEventListener
      * enabled. It starts the piped streams to enable copying of spawn
      * stream contents to standard streams.
      * @throws Exception if launching the spawnable fails
-     */ 
+     */
     void start() throws Exception {
         // Start the spawnable and timer if needed
         spawnable.start();
-        if (tm != null)
+        if (tm != null) {
             tm.startTimer();
-        
+        }
+
         // Starting the piped streams and StreamPiper objects
         systemOut = Pipe.open();
         systemOut.source().configureBlocking(false);
-        spawnOutToSystemOut = new StreamPiper(System.out, 
+        spawnOutToSystemOut = new StreamPiper(System.out,
                                               spawnable.getStdout(),
                                               Channels.newOutputStream(systemOut.sink()));
         spawnOutToSystemOut.start();
-        
+
         if (spawnable.getStderr() != null) {
             systemErr = Pipe.open();
             systemErr.source().configureBlocking(false);
-            
-            spawnErrToSystemErr = new StreamPiper(System.err, 
+
+            spawnErrToSystemErr = new StreamPiper(System.err,
                                                   spawnable.getStderr(),
                                                   Channels.newOutputStream(systemErr.sink()));
             spawnErrToSystemErr.start();
@@ -186,7 +194,7 @@ implements TimerEventListener
      * @return The exit code from the exited spawn.
      * @throws ExpectJException If the spawn is still running.
      */
-    int getExitValue() 
+    int getExitValue()
     throws ExpectJException
     {
         if (!isClosed()) {

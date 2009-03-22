@@ -48,7 +48,9 @@ class StreamPiper extends Thread implements Runnable {
      */
     private boolean continueProcessing = true;
 
-    // String Buffer to hold the contents of output and err
+    /**
+     * String Buffer to hold the contents of output and err.
+     */
     private volatile StringBuffer sCurrentOut = new StringBuffer();
 
     /**
@@ -121,8 +123,7 @@ class StreamPiper extends Thread implements Runnable {
             }
         } catch (IOException e) {
             if (shouldContinueProcessing()) {
-                // Got exception without having been asked to quit.  Whine.
-                e.printStackTrace();
+                LOG.error("Trouble while pushing data between streams", e);
             }
         }
     }
