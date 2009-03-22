@@ -102,4 +102,20 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- Deploy to a repository at Sourceforge -->
+  <distributionManagement>
+    <repository>
+      <id>expectj</id>
+      <name>ExpectJ Sourceforge Repository</name>
+      <uniqueVersion>false</uniqueVersion>
+      <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2repo</url>
+    </repository>
+    <snapshotRepository>
+      <id>expectj</id>
+      <name>ExpectJ Sourceforge Snapshot Repository</name>
+      <uniqueVersion>true</uniqueVersion>
+      <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2snapshot</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
