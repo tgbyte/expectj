@@ -38,8 +38,8 @@ public class ExpectJ {
      * @return The newly spawned process
      * @throws Exception if the spawning fails
      */
-    public SpawnedProcess spawn(Spawnable spawnable) throws Exception {
-        return new SpawnedProcess(spawnable, m_lDefaultTimeOutSeconds);
+    public Spawn spawn(Spawnable spawnable) throws Exception {
+        return new Spawn(spawnable, m_lDefaultTimeOutSeconds);
     }
     
     /**
@@ -52,7 +52,7 @@ public class ExpectJ {
      * @throws Exception if the process spawning fails
      * @see Runtime#exec(String)
      */
-    public SpawnedProcess spawn(final String sCommand) throws Exception {
+    public Spawn spawn(final String sCommand) throws Exception {
         return spawn(new ProcessSpawn(new Executor() {
             public Process execute() 
             throws IOException
@@ -76,7 +76,7 @@ public class ExpectJ {
      * @throws Exception if the process spawning fails
      * @see Runtime#exec(String[])
      */
-    public SpawnedProcess spawn(Executor executor)
+    public Spawn spawn(Executor executor)
     throws Exception
     {
         return spawn(new ProcessSpawn(executor));
@@ -90,7 +90,7 @@ public class ExpectJ {
      * @throws Exception if the telnet spawning fails
      * @throws UnknownHostException if you specify a bogus host name
      */
-    public SpawnedProcess spawn(String hostName, int port)
+    public Spawn spawn(String hostName, int port)
     throws Exception, UnknownHostException
     {
         return spawn(new TelnetSpawn(hostName, port));

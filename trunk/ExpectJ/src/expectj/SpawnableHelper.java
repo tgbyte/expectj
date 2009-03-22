@@ -101,7 +101,7 @@ implements TimerEventListener
     /**
      * From now on, don't copy any piped content to stdout.
      * @see #startPipingToStandardOut()
-     * @see SpawnedProcess#interact()
+     * @see Spawn#interact()
      */
     synchronized void stopPipingToStandardOut() {
         spawnOutToSystemOut.stopPipingToStandardOut();
@@ -113,7 +113,7 @@ implements TimerEventListener
     /**
      * From now on, copy all piped content to stdout.
      * @see #stopPipingToStandardOut()
-     * @see SpawnedProcess#interact()
+     * @see Spawn#interact()
      */
     synchronized void startPipingToStandardOut() {
         spawnOutToSystemOut.startPipingToStandardOut();

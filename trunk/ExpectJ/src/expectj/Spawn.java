@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author	Sachin Shekar Shetty
  */
-public class SpawnedProcess {
+public class Spawn {
     /**
      * Log messages go here.
      */
@@ -69,7 +69,7 @@ public class SpawnedProcess {
      * @param lDefaultTimeOutSeconds Default timeout for expect commands
      * @throws Exception on trouble launching the spawn
      */
-    SpawnedProcess(Spawnable spawn, long lDefaultTimeOutSeconds)
+    Spawn(Spawnable spawn, long lDefaultTimeOutSeconds)
     throws Exception
     {
         if (lDefaultTimeOutSeconds < -1) {
@@ -174,11 +174,11 @@ public class SpawnedProcess {
         if (lTimeOutSeconds != -1 ) {
             tm = new Timer(lTimeOutSeconds, new TimerEventListener() {
                 public void timerTimedOut() {
-                    SpawnedProcess.this.timerTimedOut();
+                    Spawn.this.timerTimedOut();
                 }
 
                 public void timerInterrupted(InterruptedException reason) {
-                    SpawnedProcess.this.timerInterrupted(reason);
+                    Spawn.this.timerInterrupted(reason);
                 }
             });
             tm.startTimer();

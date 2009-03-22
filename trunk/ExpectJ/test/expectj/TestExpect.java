@@ -3,11 +3,12 @@ package expectj;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.TestCase;
 import expectj.test.StagedSpawnable;
 
+import junit.framework.TestCase;
+
 /**
- * Verify that the different expect() methods of {@link SpawnedProcess} work as expected.
+ * Verify that the different expect() methods of {@link Spawn} work as expected.
  * @author johan.walles@gmail.com
  */
 public class TestExpect extends TestCase
@@ -19,12 +20,12 @@ public class TestExpect extends TestCase
      * @return A new SpawnedProcess.
      * @throws Exception when things go wrong.
      */
-    private SpawnedProcess getSpawnedProcess(String strings[])
+    private Spawn getSpawnedProcess(String strings[])
     throws Exception
     {
         return new ExpectJ().spawn(new StagedSpawnable(strings));
     }
-    
+
     /**
      * Test that we can find simple strings.
      * @throws Exception if things go wrong.
@@ -32,7 +33,7 @@ public class TestExpect extends TestCase
     public void testExpectStrings()
     throws Exception
     {
-        SpawnedProcess testMe = getSpawnedProcess(new String[] {"flaska", "gris"});
+        Spawn testMe = getSpawnedProcess(new String[] {"flaska", "gris"});
         testMe.expect("flaska");
         testMe.expect("gris");
     }
@@ -44,12 +45,12 @@ public class TestExpect extends TestCase
     public void testExpectStringsWithExtraData()
     throws Exception
     {
-        SpawnedProcess testMe =
+        Spawn testMe =
             getSpawnedProcess(new String[] {"flaska", "nyckel", "gris"});
         testMe.expect("flaska");
         testMe.expect("gris");
     }
-    
+
     /**
      * Test that we get notified about closes.
      * @throws Exception if things go wrong.
@@ -57,19 +58,19 @@ public class TestExpect extends TestCase
     public void testExpectClose()
     throws Exception
     {
-        SpawnedProcess testMe = getSpawnedProcess(new String[] {"flaska", "gris"});
+        Spawn testMe = getSpawnedProcess(new String[] {"flaska", "gris"});
         testMe.expectClose();
     }
-    
+
     /**
      * Test that we time out properly when we don't find what we're looking for.
      * @throws Exception if things go wrong.
      */
     public void testTimeout()
-    throws Exception 
+    throws Exception
     {
         // Test longer duration output than timeout
-        SpawnedProcess testMe =
+        Spawn testMe =
             getSpawnedProcess(new String[] {"flaska", "nyckel", "gris", "hink", "bil", "stork"});
         Date beforeTimeout = new Date();
         try {
@@ -79,14 +80,14 @@ public class TestExpect extends TestCase
             // Ignoring expected exception
         }
         Date afterTimeout = new Date();
-        
+
         long msElapsed = afterTimeout.getTime() - beforeTimeout.getTime();
         if (msElapsed < 900 || msElapsed > 1100) {
             fail("expect() should have timed out after 1s, timed out in "
                  + msElapsed
                  + "ms");
         }
-        
+
         testMe =
             getSpawnedProcess(new String[] {"flaska", "nyckel", "gris", "hink", "bil", "stork"});
         beforeTimeout = new Date();
@@ -97,11 +98,11 @@ public class TestExpect extends TestCase
             // Ignoring expected exception
         }
         afterTimeout = new Date();
-        
+
         msElapsed = afterTimeout.getTime() - beforeTimeout.getTime();
         if (msElapsed < 900 || msElapsed > 1100) {
             fail("expectClose() should have timed out after 1s, timed out in "
-                 + msElapsed 
+                 + msElapsed
                  + "ms");
         }
     }
