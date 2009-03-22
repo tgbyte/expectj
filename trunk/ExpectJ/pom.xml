@@ -105,6 +105,15 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+	  <!-- Our web site stuff is in the top site directory -->
+          <siteDirectory>${basedir}/site</siteDirectory>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
 
@@ -222,7 +231,11 @@
     </snapshotRepository>
 
     <site>
-      <id>website</id>
+      <!--
+	  FIXME: This should point to
+	  scp://shell.sf.net/home/groups/e/ex/expectj/htdocs
+	  on <id>expectj</id>.
+	-->
       <url>file:///tmp/expectj-site</url>
     </site>
   </distributionManagement>

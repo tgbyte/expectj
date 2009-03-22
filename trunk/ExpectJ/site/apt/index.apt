@@ -1,0 +1,14 @@
+~~ Emacs, this is a -*-text-*- file
+ ExpectJ is a Java implementation of
+ {{{http://expect.nist.gov/}the Unix expect utility}}. ExpectJ
+ provides a Unix expect like support to write Java Programs that
+ communicate with other programs and perform some operation on them.
+
+ If you are not familiar with working of the Unix expect utility,
+ please refer to man page of expect. Usage of ExpectJ requires a
+ proper understanding of the Unix expect utility. sdfafdsa fdsa fd
+
+ For example using ExpectJ you can write a Java program that telnets
+ to a host machine and deletes the contents of /tmp. This program when
+ configured as a cron job will always keep the /tmp under the
+ specified limit.
