@@ -16,8 +16,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This class represents a spawned process. This will also interact with
- * the process to read and write to it.
+ * This class is used for talking to processes / ports. This will also interact
+ * with the process to read and write to it.
  *
  * @author	Sachin Shekar Shetty
  */
@@ -40,6 +40,9 @@ public class Spawn {
      */
     private SpawnableHelper slave = null;
 
+    /**
+     * Turns false on timeout.
+     */
     private volatile boolean continueReading = true;
 
     // Piper objects to pipe the process streams to standard streams
@@ -96,8 +99,7 @@ public class Spawn {
     }
 
     /**
-     * Timer callback method
-     * This method is invoked when the time-out occur
+     * This method is invoked by our {@link Timer} when the time-out occurs.
      */
     private synchronized void timerTimedOut() {
         continueReading = false;
@@ -111,68 +113,48 @@ public class Spawn {
     }
 
     /**
-     * Timer callback method
-     * This method is invoked by the Timer, when the timer thread
+     * This method is invoked by our {@link Timer} when the timer thread
      * receives an interrupted exception
-     * @param reason Why we were interrupted
+     * @param reason The reason for the interrupt
      */
     private void timerInterrupted(InterruptedException reason) {
         timerTimedOut();
     }
 
     /**
-     * @return true if the last expect() or expectErr() method
-     * returned because of a time out rather then a match against
-     * the output of the process.
-     */
-    public boolean isLastExpectTimeOut() {
-        return !continueReading;
-    }
-    /**
-     * This method functions exactly like the Unix expect command.
-     * It waits until a string is read from the standard output stream
-     * of the spawned process that matches the string pattern.
-     * SpawnedProcess does a cases insensitive substring match for pattern
-     * against the output of the spawned process.
-     * lDefaultTimeOut is the timeout in seconds that the expect command
-     * should wait for the pattern to match. This function returns
-     * when a match is found or after lTimOut seconds.
-     * You can use the SpawnedProcess.isLastExpectTimeOut() to identify
-     * the return path of the method. A timeout of -1 will make the expect
-     * method wait indefinitely until the supplied pattern matches
-     * with the Standard Out.
-     *
+     * Wait for a pattern to appear on standard out.
      * @param pattern The case-insensitive substring to match against.
-     * @param lTimeOutSeconds The timeout in seconds before the match fails.
+     * @param timeOutSeconds The timeout in seconds before the match fails.
      * @throws IOException on IO trouble waiting for pattern
      * @throws TimeoutException on timeout waiting for pattern
      */
-    public void expect(String pattern, long lTimeOutSeconds)
+    public void expect(String pattern, long timeOutSeconds)
     throws IOException, TimeoutException
     {
-        expect(pattern, lTimeOutSeconds, stdoutSelector);
+        expect(pattern, timeOutSeconds, stdoutSelector);
     }
 
     /**
      * Wait for the spawned process to finish.
-     * @param lTimeOutSeconds The number of seconds to wait before giving up, or
+     * @param timeOutSeconds The number of seconds to wait before giving up, or
      * -1 to wait forever.
      * @throws ExpectJException
-     * @throws TimeoutException
+     * @throws TimeoutException if the spawn didn't finish inside of the
+     * timeout.
      * @see #expectClose()
      */
-    public void expectClose(long lTimeOutSeconds)
+    public void expectClose(long timeOutSeconds)
     throws ExpectJException, TimeoutException
     {
-        if (lTimeOutSeconds < -1) {
+        if (timeOutSeconds < -1) {
             throw new IllegalArgumentException("Timeout must be >= -1, was "
-                                               + lTimeOutSeconds);
+                                               + timeOutSeconds);
         }
 
         LOG.debug("Waiting for spawn to close connection...");
         Timer tm = null;
-        if (lTimeOutSeconds != -1 ) {
-            tm = new Timer(lTimeOutSeconds, new TimerEventListener() {
+        if (timeOutSeconds != -1 ) {
+            tm = new Timer(timeOutSeconds, new TimerEventListener() {
                 public void timerTimedOut() {
                     Spawn.this.timerTimedOut();
                 }
@@ -219,8 +201,10 @@ public class Spawn {
     /**
      * Wait the default timeout for the spawned process to finish.
      * @throws ExpectJException If something fails.
-     * @throws TimeoutException
+     * @throws TimeoutException if the spawn didn't finish inside of the default
+     * timeout.
      * @see #expectClose(long)
+     * @see ExpectJ#ExpectJ(long)
      */
     public void expectClose()
     throws ExpectJException, TimeoutException
@@ -309,9 +293,7 @@ public class Spawn {
     }
 
     /**
-     * This method functions exactly like the corresponding expect
-     * function except for it tries to match the pattern with the
-     * output  of standard error stream of the spawned process.
+     * Wait for a pattern to appear on standard error.
      * @see #expect(String, long)
      * @param pattern The case-insensitive substring to match against.
      * @param lTimeOutSeconds The timeout in seconds before the match fails.
@@ -325,8 +307,7 @@ public class Spawn {
     }
 
     /**
-     * This method functions exactly like expect described above,
-     * but uses the default timeout specified in the ExpectJ constructor.
+     * Wait for a pattern to appear on standard out.
      * @param pattern The case-insensitive substring to match against.
      * @throws TimeoutException on timeout waiting for pattern
      * @throws IOException on IO trouble waiting for pattern
@@ -338,12 +319,11 @@ public class Spawn {
     }
 
     /**
-     * This method functions exactly like the corresponding expect
-     * function except for it tries to match the pattern with the output
-     * of standard error stream of the spawned process.
+     * Wait for a pattern to appear on standard error.
      * @param pattern The case-insensitive substring to match against.
      * @throws TimeoutException on timeout waiting for pattern
      * @throws IOException on IO trouble waiting for pattern
+     * @see #expect(String)
      */
     public void expectErr(String pattern)
     throws IOException, TimeoutException
@@ -352,8 +332,8 @@ public class Spawn {
     }
 
     /**
-     * This method should be use use to check the process status
-     * before invoking send()
+     * This method can be use use to check the target process status
+     * before invoking {@link #send(String)}
      * @return true if the process has already exited.
      */
     public boolean isClosed() {
@@ -361,6 +341,7 @@ public class Spawn {
     }
 
     /**
+     * Retrieve the exit code of a finished process.
      * @return the exit code of the process if the process has
      * already exited.
      * @throws ExpectJException if the spawn is still running.
@@ -372,8 +353,7 @@ public class Spawn {
     }
 
     /**
-     * This method writes the string line to the standard input of the spawned
-     * process.
+     * Writes a string to the standard input of the spawned process.
      *
      * @param string The string to send.  Don't forget to terminate it with \n
      * if you want it linefed.
@@ -387,11 +367,9 @@ public class Spawn {
     }
 
     /**
-     * This method functions like exactly the Unix interact command.
-     * It allows the user to interact with the spawned process.
-     * Known Issues: User input is echoed twice on the screen, need to
-     * fix this ;)
+     * Allows the user to interact with the spawned process.
      *
+     * @todo User input is echoed twice on the screen
      */
     public void interact() {
         interactIn = new StreamPiper(null,
@@ -412,7 +390,6 @@ public class Spawn {
      * This method kills the process represented by SpawnedProcess object.
      */
     public void stop() {
-
         if (interactIn != null) {
             interactIn.stopProcessing();
         }

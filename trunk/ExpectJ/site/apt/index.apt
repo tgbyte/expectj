@@ -50,6 +50,11 @@ Downloading
 </project>
 +-------------------------------+
 
+ If you <really> don't want to use {{{http://maven.apache.org}Maven}},
+ try your luck at
+ {{{http://sourceforge.net/project/showfiles.php?group_id=98171}the
+ Sourceforge download page}}
+
 Licensing
 
  ExpectJ is released under the
