@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class is responsible for piping the output of one stream to the
  * other. Optionally it also copies the content to standard out or
- * standard err
+ * standard err.
  *
  * @author	Sachin Shekar Shetty
  */
@@ -25,12 +25,12 @@ class StreamPiper extends Thread implements Runnable {
     /**
      * Read data from here.
      */
-    private InputStream pi = null;
+    private InputStream inputStream = null;
 
     /**
      * Write data to here.
      */
-    private OutputStream po = null;
+    private OutputStream outputStream = null;
 
     /**
      * Optionally send a copy of all piped data to here.
@@ -38,7 +38,8 @@ class StreamPiper extends Thread implements Runnable {
     private PrintStream copyStream = null;
 
     /**
-     * When true we drop data from {@link #pi} rather than passing it to {@link #po}.
+     * When true we drop data from {@link #inputStream} rather than passing it
+     * to {@link #outputStream}.
      */
     volatile boolean stopPiping = false;
 
@@ -64,8 +65,8 @@ class StreamPiper extends Thread implements Runnable {
         if (pi == null) {
             throw new NullPointerException("Input stream must not be null");
         }
-        this.pi = pi;
-        this.po = po;
+        this.inputStream = pi;
+        this.outputStream = po;
         this.copyStream = copyStream;
         // So that JVM does not wait for these threads
         this.setDaemon(true);
@@ -79,7 +80,11 @@ class StreamPiper extends Thread implements Runnable {
         stopPiping = true;
     }
 
-    synchronized void startPipingToStandardOut() {
+    /**
+     * This method is used to start copying on to Standard out and err.
+     * This is used after interact.
+     */
+    public synchronized void startPipingToStandardOut() {
         stopPiping = false;
     }
 
@@ -87,7 +92,7 @@ class StreamPiper extends Thread implements Runnable {
      * This is used to stop the thread, after the process is killed
      */
     public synchronized void stopProcessing() {
-        setContinueProcessing(false);
+        continueProcessing = false;
     }
 
     /**
@@ -105,45 +110,27 @@ class StreamPiper extends Thread implements Runnable {
         int bytes_read;
 
         try {
-            while(shouldContinueProcessing()) {
-                bytes_read = pi.read(buffer);
+            while(continueProcessing) {
+                bytes_read = inputStream.read(buffer);
                 if (bytes_read == -1) {
                     LOG.debug("Stream ended, closing");
-                    pi.close();
-                    po.close();
+                    inputStream.close();
+                    outputStream.close();
                     return;
                 }
-                po.write(buffer, 0, bytes_read);
+                outputStream.write(buffer, 0, bytes_read);
                 sCurrentOut.append(new String(buffer, 0, bytes_read));
                 if (copyStream != null && !stopPiping) {
                     copyStream.write(buffer, 0, bytes_read);
                     copyStream.flush();
                 }
-                po.flush();
+                outputStream.flush();
             }
         } catch (IOException e) {
-            if (shouldContinueProcessing()) {
+            if (continueProcessing) {
                 LOG.error("Trouble while pushing data between streams", e);
             }
         }
-    }
-
-    /**
-     * Set to false to terminate data shuffling.
-     * @param continueProcessing Whether or not to continue shuffling data.
-     */
-    private synchronized void setContinueProcessing(boolean continueProcessing)
-    {
-        this.continueProcessing = continueProcessing;
-    }
-
-    /**
-     * Are we still supposed to keep shuffling data?
-     * @return True if we should continue.  False otherwise.
-     */
-    private synchronized boolean shouldContinueProcessing()
-    {
-        return continueProcessing;
     }
 
 }

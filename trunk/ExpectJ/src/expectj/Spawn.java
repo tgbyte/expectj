@@ -45,9 +45,19 @@ public class Spawn {
      */
     private volatile boolean continueReading = true;
 
-    // Piper objects to pipe the process streams to standard streams
+    /**
+     * Pumps data from stdin to the spawn's stdin.
+     */
     private StreamPiper interactIn = null;
+
+    /**
+     * Pumps data from the spawn's stdout to stdout.
+     */
     private StreamPiper interactOut = null;
+
+    /**
+     * Pumps data from the spawn's stderr to stderr.
+     */
     private StreamPiper interactErr = null;
 
     /**
@@ -138,13 +148,14 @@ public class Spawn {
      * Wait for the spawned process to finish.
      * @param timeOutSeconds The number of seconds to wait before giving up, or
      * -1 to wait forever.
-     * @throws ExpectJException
+     * @throws ExpectJException if we're interrupted while waiting for the spawn
+     * to finish.
      * @throws TimeoutException if the spawn didn't finish inside of the
      * timeout.
      * @see #expectClose()
      */
     public void expectClose(long timeOutSeconds)
-    throws ExpectJException, TimeoutException
+    throws TimeoutException, ExpectJException
     {
         if (timeOutSeconds < -1) {
             throw new IllegalArgumentException("Timeout must be >= -1, was "
