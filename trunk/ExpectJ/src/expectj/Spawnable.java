@@ -11,8 +11,9 @@ import java.io.OutputStream;
 public interface Spawnable
 {
     /**
-     * This method launches the spawn.  It starts the piped streams to enable copying of
-     * process stream contents to standard streams.
+     * This method launches the {@link Spawn}.  It starts the
+     * {@link StreamPiper}s that enable copying of process stream contents to
+     * standard streams.
      * @throws Exception on trouble.
      */
     void start() throws Exception;
