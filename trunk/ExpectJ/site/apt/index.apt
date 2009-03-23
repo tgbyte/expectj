@@ -1,7 +1,8 @@
 ~~ Emacs, this is a -*-text-*- file
- ExpectJ is a Java implementation of {{{http://expect.nist.gov/}the
- Unix expect utility}}. It can be used for automating interaction with
- either a process (through stdin / stdout) or a telnet session.
+ ExpectJ can be used for automating interaction with
+ either a process (through stdin / stdout) or a telnet session. It is
+ a Java implementation of {{{http://expect.nist.gov/}the Unix expect
+ utility}}.
 
 Basic usage
 
