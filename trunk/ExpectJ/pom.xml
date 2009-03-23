@@ -235,13 +235,10 @@
       <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2snapshot</url>
     </snapshotRepository>
 
+    <!-- Deploy web site to http://expectj.sf.net -->
     <site>
-      <!--
-	  FIXME: This should point to
-	  scp://shell.sf.net/home/groups/e/ex/expectj/htdocs
-	  on <id>expectj</id>.
-	-->
-      <url>file:///tmp/expectj-site</url>
+      <id>expectj</id>
+      <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs</url>
     </site>
   </distributionManagement>
 </project>
