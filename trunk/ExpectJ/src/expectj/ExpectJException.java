@@ -1,13 +1,9 @@
-/*
- * @(#) JExpectException.java 1.0 
- */
-
 package expectj;
 
 /**
  * This class extends the Exception class and encapsulates other exceptions.
- * 
- * @author	Sachin Shekar Shetty  
+ *
+ * @author	Sachin Shekar Shetty
  */
 public class ExpectJException extends Exception {
     /**
@@ -17,7 +13,7 @@ public class ExpectJException extends Exception {
     ExpectJException(String message) {
         super(message);
     }
-    
+
     /**
      * Create a new exception with an explanatory message and a reference to an exception
      * that made us throw this one.

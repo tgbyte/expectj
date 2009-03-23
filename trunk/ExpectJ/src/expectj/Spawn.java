@@ -10,7 +10,6 @@ import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -307,14 +306,14 @@ public class Spawn {
      * Wait for a pattern to appear on standard error.
      * @see #expect(String, long)
      * @param pattern The case-insensitive substring to match against.
-     * @param lTimeOutSeconds The timeout in seconds before the match fails.
+     * @param timeOutSeconds The timeout in seconds before the match fails.
      * @throws TimeoutException on timeout waiting for pattern
      * @throws IOException on IO trouble waiting for pattern
      */
-    public void expectErr(String pattern, long lTimeOutSeconds)
+    public void expectErr(String pattern, long timeOutSeconds)
     throws IOException, TimeoutException
     {
-        expect(pattern, lTimeOutSeconds, stderrSelector);
+        expect(pattern, timeOutSeconds, stderrSelector);
     }
 
     /**

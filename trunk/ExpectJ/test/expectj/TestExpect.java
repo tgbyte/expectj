@@ -1,8 +1,6 @@
 package expectj;
 
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
-
 import expectj.test.StagedSpawnable;
 
 import junit.framework.TestCase;
