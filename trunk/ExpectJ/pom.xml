@@ -127,6 +127,17 @@
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
 
+    <!-- Include licensing information in the jar -->
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+	<targetPath>META-INF</targetPath>
+	<includes>
+	  <include>LICENSE</include>
+	</includes>
+      </resource>
+    </resources>
+
     <plugins>
       <!-- We need an 1.4 environment due to using NIO -->
       <plugin>
