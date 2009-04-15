@@ -1,0 +1,63 @@
+~~ Emacs, this is a -*-text-*- file
+ ExpectJ can be used for automating interaction with
+ either a process (through stdin / stdout) or a telnet session. It is
+ a Java implementation of {{{http://expect.nist.gov/}the Unix expect
+ utility}}.
+
+Basic usage
+
+ The following snippet can be used for running a short
+ shell session. Try putting something like it in a unit test for
+ example:
+
++-------------------------------+
+// Create a new ExpectJ object with a timeout of 5s
+ExpectJ expectinator = new ExpectJ(5);
+
+// Fork the process
+Spawn shell = expectinator.spawn("/bin/sh");
+
+// Talk to it
+shell.send("echo Chunder\n");
+shell.expect("Chunder");
+shell.send("exit\n");
+shell.expectClose();
+
+// Done!
++-------------------------------+
+
+ On timeout a TimeoutException will be thrown.
+
+ More usage information is in the {{{apidocs/index.html}javadocs}}.
+
+Downloading
+
+ Don't. Use {{{http://maven.apache.org}Maven}}. Put the following
+ dependency in your pom.xml:
+
++-------------------------------+
+<project ...>
+  <dependencies>
+    <dependency>
+      <groupId>net.sourceforge.expectj</groupId>
+      <artifactId>ExpectJ</artifactId>
+
+      <!-- Optional scope: Use ExpectJ for (unit) tests only -->
+      <scope>test</scope>
+    </dependency>
+    ...
+  </dependencies>
+  ...
+</project>
++-------------------------------+
+
+ If you <really> don't want to use {{{http://maven.apache.org}Maven}},
+ try your luck at
+ {{{http://sourceforge.net/project/showfiles.php?group_id=98171}the
+ Sourceforge download page}}
+
+Licensing
+
+ ExpectJ is released under the
+ {{{http://www.gnu.org/licenses/lgpl-2.1.html#SEC1}GNU Lesser General
+ Public License 2.1}}.
