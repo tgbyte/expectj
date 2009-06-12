@@ -38,10 +38,10 @@
     <url>http://sourceforge.net/tracker/?group_id=98171</url>
   </issueManagement>
 
-  <!-- We're using SVN services from Sourceforge -->
+  <!-- We're using BZR services from Sourceforge -->
   <scm>
-    <developerConnection>scm:svn:https://expectj.svn.sourceforge.net/svnroot/expectj/trunk/ExpectJ</developerConnection>
-    <url>http://expectj.svn.sourceforge.net/</url>
+    <developerConnection>scm:bazaar:bzr://expectj.bzr.sourceforge.net/bzrroot/expectj/trunk/</developerConnection>
+    <url>http://expectj.bzr.sourceforge.net/</url>
   </scm>
 
   <developers>
@@ -177,9 +177,19 @@
       </plugin>
 
       <plugin>
-	<!-- Put the SVN revision number in the ${buildNumber} property -->
+	<!-- Put the BZR revision number in the ${buildNumber} property -->
 	<groupId>org.codehaus.mojo</groupId>
 	<artifactId>buildnumber-maven-plugin</artifactId>
+
+	<!-- Workaround for http://jira.codehaus.org/browse/MOJO-1300 -->
+	<dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-bazaar</artifactId>
+            <version>1.2</version>
+          </dependency>
+	</dependencies>
+
 	<executions>
 	  <execution>
 	    <phase>validate</phase>
@@ -189,15 +199,14 @@
 	  </execution>
 	</executions>
 	<configuration>
+	  <!-- Workaround for http://jira.codehaus.org/browse/MOJO-1300 -->
+	  <revisionOnScmFailure>MOJO1300</revisionOnScmFailure>
+
 	  <!-- Don't look for uncommitted changes before running -->
 	  <doCheck>false</doCheck>
 
-	  <!--
-	      Check for upstream changes before doing anything. This
-	      fixes problems with getting outdated revision numbers
-	      after svn commits.
-	    -->
-	  <doUpdate>true</doUpdate>
+	  <!-- Don't look for upstream changes before running -->
+	  <doUpdate>false</doUpdate>
 	</configuration>
       </plugin>
 
@@ -206,7 +215,7 @@
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-jar-plugin</artifactId>
 	<configuration>
-	  <!-- Put the SVN revision number in the JAR file name -->
+	  <!-- Put the BZR revision number in the JAR file name -->
 	  <finalName>${project.artifactId}-${project.version}-r${buildNumber}</finalName>
 
           <archive>
@@ -218,7 +227,7 @@
               <addClasspath>true</addClasspath>
             </manifest>
             <manifestEntries>
-	      <!-- Put the SVN revision number in the JAR file's Manifest -->
+	      <!-- Put the BZR revision number in the JAR file's Manifest -->
               <Implementation-Build>${buildNumber}</Implementation-Build>
             </manifestEntries>
           </archive>
