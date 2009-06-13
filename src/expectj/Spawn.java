@@ -413,6 +413,9 @@ public class Spawn {
     }
 
     /**
+     * Returns everything that has been received on the spawn's stdout during
+     * this session.
+     *
      * @return the available contents of Standard Out
      */
     public String getCurrentStandardOutContents() {
@@ -420,6 +423,9 @@ public class Spawn {
     }
 
     /**
+     * Returns everything that has been received on the spawn's stderr during
+     * this session.
+     *
      * @return the available contents of Standard Err
      */
     public String getCurrentStandardErrContents() {
