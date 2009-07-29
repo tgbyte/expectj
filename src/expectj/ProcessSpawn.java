@@ -173,7 +173,14 @@ implements Spawnable
         public void stop() {
             LOG.debug("Process '" + executor + "' killed");
             process.destroy();
-            thread.interrupt();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                // Process should have died when calling process.destroy().
+                // After that, process.waitFor() should return, causing the
+                // run() method above to terminate.
+                LOG.error("Interrupted waiting for process supervisor thread to finish", e);
+            }
         }
     }
 }
