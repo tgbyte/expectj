@@ -106,26 +106,26 @@ public class TestExpect extends TestCase
 
         // Try a couple of different FTP binaries
         try {
-            return new ExpectJ().spawn("/bin/ftp");
+            return new ExpectJ(5).spawn("/bin/ftp");
         } catch (IOException e) {
             // IOException probably means "binary not found"
             throwMe = e;
         }
 
         try {
-            return new ExpectJ().spawn("ftp.exe");
+            return new ExpectJ(5).spawn("ftp.exe");
         } catch (IOException e) {
             // This exception intentionally ignored
         }
 
         try {
-            return new ExpectJ().spawn("/usr/bin/ftp");
+            return new ExpectJ(5).spawn("/usr/bin/ftp");
         } catch (IOException e) {
             // This exception intentionally ignored
         }
 
         try {
-            return new ExpectJ().spawn("/usr/bin/lftp");
+            return new ExpectJ(5).spawn("/usr/bin/lftp");
         } catch (IOException e) {
             // This exception intentionally ignored
         }
@@ -156,5 +156,20 @@ public class TestExpect extends TestCase
 
         // Process should still be closed
         assertTrue(process.isClosed());
+    }
+
+    /**
+     * Verify that waiting for a process spawn to finish works as it should..
+     * @throws Exception on trouble
+     */
+    public void testFinishProcess() throws Exception {
+        Spawn process = getSpawnedProcess();
+        assertFalse(process.isClosed());
+
+        // Process should be closed after it finishes
+        process.send("quit\n");
+        process.expectClose();
+        process.stop();
+        assertTrue("Process wasn't closed after finishing", process.isClosed());
     }
 }
