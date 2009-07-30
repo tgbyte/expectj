@@ -40,7 +40,9 @@
 
   <!-- We're using BZR services from Sourceforge -->
   <scm>
-    <developerConnection>scm:bazaar:bzr+ssh://expectj.bzr.sourceforge.net/bzrroot/expectj/trunk/</developerConnection>
+    <!-- The johanwalles@ thing is a workaround for
+    http://jira.codehaus.org/browse/MRELEASE-465 .-->
+    <developerConnection>scm:bazaar:bzr+ssh://johanwalles@expectj.bzr.sourceforge.net/bzrroot/expectj/trunk/</developerConnection>
     <url>http://expectj.bzr.sourceforge.net/</url>
   </scm>
 
