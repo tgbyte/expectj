@@ -41,7 +41,7 @@ class StreamPiper extends Thread implements Runnable {
      * When true we drop data from {@link #inputStream} rather than passing it
      * to {@link #outputStream}.
      */
-    volatile boolean stopPiping = false;
+    boolean pipingPaused = false;
 
     /**
      * When this turns false, we shut down.  All accesses to this variable should be
@@ -53,6 +53,16 @@ class StreamPiper extends Thread implements Runnable {
      * String Buffer to hold the contents of output and err.
      */
     private volatile StringBuffer sCurrentOut = new StringBuffer();
+
+    /**
+     * When data piping is paused, we just drop data from the input stream
+     * rather than copying it to the output stream.
+     *
+     * @return True if piping is paused.  False otherwise.
+     */
+    private synchronized boolean getPipingPaused() {
+        return pipingPaused;
+    }
 
     /**
      * @param copyStream Stream to copy the contents to before piping
@@ -78,7 +88,7 @@ class StreamPiper extends Thread implements Runnable {
      * This is used after interact.
      */
     public synchronized void stopPipingToStandardOut() {
-        stopPiping = true;
+        pipingPaused = true;
     }
 
     /**
@@ -86,7 +96,7 @@ class StreamPiper extends Thread implements Runnable {
      * This is used after interact.
      */
     public synchronized void startPipingToStandardOut() {
-        stopPiping = false;
+        pipingPaused = false;
     }
 
     /**
@@ -94,6 +104,15 @@ class StreamPiper extends Thread implements Runnable {
      */
     public synchronized void stopProcessing() {
         continueProcessing = false;
+    }
+
+    /**
+     * Should we keep doing our thing?
+     *
+     * @return True if we should keep piping data.  False if we should shut down.
+     */
+    private synchronized boolean getContinueProcessing() {
+        return continueProcessing;
     }
 
     /**
@@ -111,7 +130,7 @@ class StreamPiper extends Thread implements Runnable {
         int bytes_read;
 
         try {
-            while(continueProcessing) {
+            while(getContinueProcessing()) {
                 bytes_read = inputStream.read(buffer);
                 if (bytes_read == -1) {
                     LOG.debug("Stream ended, closing");
@@ -121,14 +140,14 @@ class StreamPiper extends Thread implements Runnable {
                 }
                 outputStream.write(buffer, 0, bytes_read);
                 sCurrentOut.append(new String(buffer, 0, bytes_read));
-                if (copyStream != null && !stopPiping) {
+                if (copyStream != null && !getPipingPaused()) {
                     copyStream.write(buffer, 0, bytes_read);
                     copyStream.flush();
                 }
                 outputStream.flush();
             }
         } catch (IOException e) {
-            if (continueProcessing) {
+            if (getContinueProcessing()) {
                 LOG.error("Trouble while pushing data between streams", e);
             }
         }
