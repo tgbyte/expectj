@@ -180,7 +180,7 @@ public class Spawn {
         synchronized (timeoutNotification) {
             while(continueReading) {
                 // Sleep if process is still running
-                if(slave.isClosed()) {
+                if (slave.isClosed()) {
                     closed = true;
                     break;
                 } else {
@@ -205,6 +205,19 @@ public class Spawn {
         }
         if (!continueReading) {
             throw new TimeoutException("Timeout waiting for spawn to finish");
+        }
+
+        try {
+            if (stderrSelector != null) {
+                stderrSelector.close();
+            }
+            if (stdoutSelector != null) {
+                stdoutSelector.close();
+            }
+        } catch (IOException e) {
+            // Closing the selectors is a best effort operation, failures are
+            // logged but otherwise accepted.
+            LOG.warn("Failed closing selectors after spawn done", e);
         }
     }
 

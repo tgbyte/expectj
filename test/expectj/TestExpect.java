@@ -172,4 +172,19 @@ public class TestExpect extends TestCase
         process.stop();
         assertTrue("Process wasn't closed after finishing", process.isClosed());
     }
+
+    /**
+     * Spawn a ton of stuff in the hope that we'll get an exception if we leak
+     * resources somewhere.
+     * @throws Exception on trouble.
+     */
+    public void testSpawnLeaks() throws Exception {
+        for (int i = 0; i < 2048; i++) {
+            try {
+                getSpawn(new String[0]).expectClose(1);
+            } catch (Exception e) {
+                throw new Exception("Leak test failed after " + i + " iterations", e);
+            }
+        }
+    }
 }
