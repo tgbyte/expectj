@@ -149,7 +149,7 @@ implements Spawnable
          */
         public void start() throws IOException {
             LOG.debug("Starting process '" + executor + "'");
-            thread = new Thread(this);
+            thread = new Thread(this, "ExpectJ: " + executor);
             process = executor.execute();
             thread.start();
         }

@@ -20,12 +20,12 @@ public class StagedStringProducer
      * The user will read data from here.
      */
     private PipedInputStream inputStream;
-    
+
     /**
      * The string producing thread.
      */
     private ProducerThread producerThread;
-    
+
     /**
      * Thread that writes data to the pipe in stages.
      * @author johan.walles@gmail.com
@@ -36,17 +36,17 @@ public class StagedStringProducer
          * Write these strings to the output stream.
          */
         private String writeUs[];
-        
+
         /**
          * Write strings to here.
          */
         OutputStream destination;
-        
+
         /**
          * Are we done?
          */
         private boolean done = false;
-        
+
         /**
          * @param destination Where to write data to.
          * @param stringsToWrite The data to write.
@@ -54,8 +54,9 @@ public class StagedStringProducer
         public ProducerThread(OutputStream destination, String stringsToWrite[]) {
             this.destination = destination;
             this.writeUs = stringsToWrite;
+            this.setName("ExpectJ String Producer");
         }
-        
+
         public void run() {
             PrintStream output = new PrintStream(this.destination);
             boolean justStarting = true;
@@ -68,7 +69,7 @@ public class StagedStringProducer
                     }
                 }
                 justStarting = false;
-                
+
                 String writeMe = writeUs[i];
                 if (writeMe != null) {
                     output.append(writeMe);
@@ -95,7 +96,7 @@ public class StagedStringProducer
             return done;
         }
     }
-    
+
     /**
      * Construct a staged string producer.
      * <p>
@@ -104,7 +105,7 @@ public class StagedStringProducer
      * string here".
      * <p>
      * Strings can be read from the {@link #getStringStream()} stream.
-     * 
+     *
      * @param stringsToProduce The strings to produce.
      * @exception IOException If an IO error occurs.
      */
@@ -116,14 +117,14 @@ public class StagedStringProducer
         this.producerThread = new ProducerThread(outputStream, stringsToProduce);
         this.producerThread.start();
     }
-    
+
     /**
      * @return A reference to the stream on which we'll produce data.
      */
     public InputStream getStringStream() {
         return this.inputStream;
     }
-    
+
     /**
      * @return true if we have finished producing data.  False otherwise.
      */

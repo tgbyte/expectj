@@ -70,6 +70,7 @@ class StreamPiper extends Thread implements Runnable {
         this.copyStream = copyStream;
         // So that JVM does not wait for these threads
         this.setDaemon(true);
+        this.setName("ExpectJ Stream Piper");
     }
 
     /**

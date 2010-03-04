@@ -33,7 +33,7 @@ implements TimerEventListener
             throw new IllegalArgumentException("Time-out is invalid");
         }
         if (timeOutSeconds != -1) {
-            tm = new Timer(timeOutSeconds, this);
+            timer = new Timer(timeOutSeconds, this);
         }
         this.spawnable = runMe;
     }
@@ -46,7 +46,7 @@ implements TimerEventListener
     }
 
     /** Timer object to monitor our Spawnable */
-    private Timer tm = null;
+    private Timer timer = null;
 
     /**
      * Handle spawn's stdout.
@@ -132,8 +132,8 @@ implements TimerEventListener
     void start() throws Exception {
         // Start the spawnable and timer if needed
         spawnable.start();
-        if (tm != null) {
-            tm.startTimer();
+        if (timer != null) {
+            timer.startTimer();
         }
 
         // Starting the piped streams and StreamPiper objects
