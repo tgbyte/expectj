@@ -207,17 +207,31 @@ public class Spawn {
             throw new TimeoutException("Timeout waiting for spawn to finish");
         }
 
+        // Free up no-longer-used system resources
         try {
+            slave.close();
+            if (interactIn != null) {
+                interactIn.stopProcessing();
+            }
+            if (interactOut != null) {
+                interactOut.stopProcessing();
+            }
+            if (interactErr != null) {
+                interactErr.stopProcessing();
+            }
             if (stderrSelector != null) {
                 stderrSelector.close();
             }
             if (stdoutSelector != null) {
                 stdoutSelector.close();
             }
+            if (toStdin != null) {
+                toStdin.close();
+            }
         } catch (IOException e) {
-            // Closing the selectors is a best effort operation, failures are
+            // Cleaning up is a best effort operation, failures are
             // logged but otherwise accepted.
-            LOG.warn("Failed closing selectors after spawn done", e);
+            LOG.warn("Failed cleaning up after spawn done", e);
         }
     }
 

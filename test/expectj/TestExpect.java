@@ -1,7 +1,12 @@
 package expectj;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
+
+import org.mockito.Mockito;
+
 import expectj.test.StagedSpawnable;
 
 import junit.framework.TestCase;
@@ -178,12 +183,31 @@ public class TestExpect extends TestCase
      * resources somewhere.
      * @throws Exception on trouble.
      */
-    public void testSpawnLeaks() throws Exception {
-        for (int i = 0; i < 2048; i++) {
+    public void testSpawnLeaks1() throws Exception {
+        Spawnable dummySpawn = (Spawnable)Mockito.mock(Spawnable.class);
+        Mockito.when(Boolean.valueOf(dummySpawn.isClosed())).thenReturn(Boolean.TRUE);
+        InputStream empty = new ByteArrayInputStream(new byte[0]);
+        Mockito.when(dummySpawn.getStdout()).thenReturn(empty);
+        for (int i = 0; i < 1024; i++) {
+            try {
+                new ExpectJ().spawn(dummySpawn).expectClose(1);
+            } catch (Exception e) {
+                throw new Exception("Leak test 1 failed after " + i + " iterations", e);
+            }
+        }
+    }
+
+    /**
+     * Spawn a ton of stuff in the hope that we'll get an exception if we leak
+     * resources somewhere.
+     * @throws Exception on trouble.
+     */
+    public void testSpawnLeaks2() throws Exception {
+        for (int i = 0; i < 1024; i++) {
             try {
                 getSpawn(new String[0]).expectClose(1);
             } catch (Exception e) {
-                throw new Exception("Leak test failed after " + i + " iterations", e);
+                throw new Exception("Leak test 2 failed after " + i + " iterations", e);
             }
         }
     }

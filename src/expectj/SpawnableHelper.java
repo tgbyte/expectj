@@ -1,5 +1,6 @@
 package expectj;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
@@ -152,6 +153,28 @@ implements TimerEventListener
                                                   spawnable.getStderr(),
                                                   Channels.newOutputStream(systemErr.sink()));
             spawnErrToSystemErr.start();
+        }
+    }
+
+    /**
+     * Shut down operations and free system resources.
+     *
+     * @throws IOException On trouble shutting down.
+     */
+    void close() throws IOException {
+        if (spawnErrToSystemErr != null) {
+            spawnErrToSystemErr.stopProcessing();
+        }
+        if (spawnOutToSystemOut != null) {
+            spawnOutToSystemOut.stopProcessing();
+        }
+        if (systemOut != null) {
+            systemOut.sink().close();
+            systemOut.source().close();
+        }
+        if (systemErr != null) {
+            systemErr.sink().close();
+            systemErr.source().close();
         }
     }
 
