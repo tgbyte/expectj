@@ -1,9 +1,14 @@
 package expectj;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.mockito.Mockito;
 
@@ -17,6 +22,51 @@ import junit.framework.TestCase;
  */
 public class TestExpect extends TestCase
 {
+    /**
+     * The number of file handles available to us.
+     *
+     * @see #getLeakTestIterations()
+     */
+    private int availableFileHandles = 0;
+
+    /**
+     * We can {@link Runtime#exec(String)} this to start an FTP client.
+     */
+    private String ftpBinary;
+
+    /**
+     * How many iterations must we run a leak test before we can be confident
+     * we aren't leaking any file handles?
+     *
+     * @return The number of file handles available plus some marigin.
+     *
+     * @throws IOException If counting the number of file handles fails.
+     */
+    private int getLeakTestIterations() throws IOException {
+        if (availableFileHandles == 0) {
+            File dummy = File.createTempFile("testExpectJ", ".tmp");
+            dummy.deleteOnExit();
+            List fileHandles = new LinkedList();
+            try {
+                while (true) {
+                    fileHandles.add(new FileReader(dummy));
+                }
+            } catch (IOException e) {
+                // Assume the IOE was because we ran out of file handles
+                Iterator iter = fileHandles.iterator();
+                while (iter.hasNext()) {
+                    FileReader fileHandle = (FileReader)iter.next();
+                    fileHandle.close();
+                }
+                availableFileHandles = fileHandles.size() + 42;
+            } finally {
+                assertTrue(dummy.delete());
+            }
+        }
+
+        return availableFileHandles;
+    }
+
     /**
      * Generate a Spawn producing the indicated output on stdout.
      * @param strings The strings to print to stdout.  Strings will be produced with
@@ -107,30 +157,41 @@ public class TestExpect extends TestCase
      * @throws Exception on trouble
      */
     private Spawn getSpawnedProcess() throws Exception {
-        IOException throwMe = null;
+        if (ftpBinary != null) {
+            return new ExpectJ(5).spawn(ftpBinary);
+        }
 
         // Try a couple of different FTP binaries
+        IOException throwMe = null;
         try {
-            return new ExpectJ(5).spawn("/bin/ftp");
+            Spawn spawn = new ExpectJ(5).spawn("/bin/ftp");
+            ftpBinary = "/bin/ftp";
+            return spawn;
         } catch (IOException e) {
             // IOException probably means "binary not found"
             throwMe = e;
         }
 
         try {
-            return new ExpectJ(5).spawn("ftp.exe");
+            Spawn spawn = new ExpectJ(5).spawn("ftp.exe");
+            ftpBinary = "ftp.exe";
+            return spawn;
         } catch (IOException e) {
             // This exception intentionally ignored
         }
 
         try {
-            return new ExpectJ(5).spawn("/usr/bin/ftp");
+            Spawn spawn = new ExpectJ(5).spawn("/usr/bin/ftp");
+            ftpBinary = "/usr/bin/ftp";
+            return spawn;
         } catch (IOException e) {
             // This exception intentionally ignored
         }
 
         try {
-            return new ExpectJ(5).spawn("/usr/bin/lftp");
+            Spawn spawn = new ExpectJ(5).spawn("/usr/bin/lftp");
+            ftpBinary = "/usr/bin/lftp";
+            return spawn;
         } catch (IOException e) {
             // This exception intentionally ignored
         }
@@ -164,17 +225,32 @@ public class TestExpect extends TestCase
     }
 
     /**
-     * Verify that waiting for a process spawn to finish works as it should..
+     * Verify that waiting for a process spawn to finish and then stopping it
+     * works as it should.
+     *
      * @throws Exception on trouble
      */
-    public void testFinishProcess() throws Exception {
+    public void testFinishProcess1() throws Exception {
+        Spawn process = getSpawnedProcess();
+        assertFalse(process.isClosed());
+
+        process.send("quit\n");
+        process.expectClose();
+        process.stop();
+        assertTrue("Process wasn't closed after stop", process.isClosed());
+    }
+
+    /**
+     * Verify that waiting for a process spawn to finish works as it should.
+     * @throws Exception on trouble
+     */
+    public void testFinishProcess2() throws Exception {
         Spawn process = getSpawnedProcess();
         assertFalse(process.isClosed());
 
         // Process should be closed after it finishes
         process.send("quit\n");
         process.expectClose();
-        process.stop();
         assertTrue("Process wasn't closed after finishing", process.isClosed());
     }
 
@@ -188,7 +264,7 @@ public class TestExpect extends TestCase
         Mockito.when(Boolean.valueOf(dummySpawn.isClosed())).thenReturn(Boolean.TRUE);
         InputStream empty = new ByteArrayInputStream(new byte[0]);
         Mockito.when(dummySpawn.getStdout()).thenReturn(empty);
-        for (int i = 0; i < 1024; i++) {
+        for (int i = 0; i < getLeakTestIterations(); i++) {
             try {
                 new ExpectJ().spawn(dummySpawn).expectClose(1);
             } catch (Exception e) {
@@ -203,11 +279,77 @@ public class TestExpect extends TestCase
      * @throws Exception on trouble.
      */
     public void testSpawnLeaks2() throws Exception {
-        for (int i = 0; i < 1024; i++) {
+        for (int i = 0; i < getLeakTestIterations(); i++) {
             try {
                 getSpawn(new String[0]).expectClose(1);
             } catch (Exception e) {
                 throw new Exception("Leak test 2 failed after " + i + " iterations", e);
+            }
+        }
+    }
+
+    /**
+     * Spawn a ton of stuff in the hope that we'll get an exception if we leak
+     * resources somewhere.
+     * @throws Exception on trouble.
+     */
+    public void testSpawnLeaks3() throws Exception {
+        for (int i = 0; i < getLeakTestIterations(); i++) {
+            try {
+                // FIXME: Test a TelnetSpawn
+            } catch (Exception e) {
+                throw new Exception("Leak test 3 failed after " + i + " iterations", e);
+            }
+        }
+    }
+
+    /**
+     * Spawn a ton of stuff in the hope that we'll get an exception if we leak
+     * resources somewhere.
+     * @throws Exception on trouble.
+     */
+    public void testSpawnLeaks4() throws Exception {
+        // Spawn several processes in parallel as it goes a lot faster than
+        // doing one at a time.  More than 10 didn't help.
+        final int PARALLELLISM = 10;
+
+        long t0 = System.currentTimeMillis();
+        for (int i = 0; i < getLeakTestIterations(); i += PARALLELLISM) {
+            try {
+                if ((i > 0 && i % 30 == 0)
+                    || (i == getLeakTestIterations() - 1))
+                {
+                    // This takes a while, print some progress...
+                    long now = System.currentTimeMillis();
+                    double dSeconds = (now - t0) / 1000.0;
+                    double hz = i / dSeconds;
+                    int iterLeft = getLeakTestIterations() - i;
+                    double eta = iterLeft / hz;
+                    System.out.format("%4d/%d iterations done in %.1fs at %.1fHz, ETA: %.1fs\n",
+                        new Object[] {
+                        Integer.valueOf(i),
+                        Integer.valueOf(getLeakTestIterations()),
+                        Double.valueOf(dSeconds),
+                        Double.valueOf(hz),
+                        Double.valueOf(eta)
+                    });
+                }
+
+                Spawn spawns[] = new Spawn[PARALLELLISM];
+                for (int j = 0; j < spawns.length; j++) {
+                    spawns[j] = getSpawnedProcess();
+                }
+
+                // Exit FTP nicely
+                for (int j = 0; j < spawns.length; j++) {
+                    spawns[j].send("quit\n");
+                }
+
+                for (int j = 0; j < spawns.length; j++) {
+                    spawns[j].expectClose(1);
+                }
+            } catch (Exception e) {
+                throw new Exception("Leak test 4 failed after " + i + " iterations", e);
             }
         }
     }
