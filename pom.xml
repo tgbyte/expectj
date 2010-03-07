@@ -184,6 +184,13 @@
         </configuration>
       </plugin>
 
+      <!-- We need version 2.0 of the release plugin for bzr support -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+	<version>2.0</version>
+      </plugin>
+
       <plugin>
 	<!-- Create a JAR file -->
 	<groupId>org.apache.maven.plugins</groupId>
