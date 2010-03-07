@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,8 +22,62 @@ import junit.framework.TestCase;
  * Verify that the different expect() methods of {@link Spawn} work as expected.
  * @author johan.walles@gmail.com
  */
-public class TestExpect extends TestCase
-{
+public class TestExpect extends TestCase {
+    /**
+     * Accepts connections on a port and closes them immediately.
+     *
+     * @author johan.walles@gmail.com
+     */
+    private static class ConnectionsDropper {
+        /**
+         * The server socket we're listening on.
+         */
+        private ServerSocket listener;
+
+        /**
+         * Create a new connections dropper.
+         *
+         * @throws IOException If we're unable to open a port to listen to.
+         */
+        public ConnectionsDropper() throws IOException {
+            listener = new ServerSocket(0);
+
+            String threadName =
+                "Connections dropper , (port " + listener.getLocalPort() + ")";
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        while (true) {
+                            Socket incoming = listener.accept();
+                            incoming.close();
+                        }
+                    } catch (IOException e) {
+                        // Just quit listening if we fail, it probably means
+                        // somebody closed our socket on purpose.
+                    }
+                }
+            }, threadName).start();
+        }
+
+        /**
+         * Which port are we listening to?
+         *
+         * @return The local port we're listening to.
+         */
+        public int getListeningPort() {
+            return listener.getLocalPort();
+        }
+
+        /**
+         * Stop listening for connections.
+         *
+         * @throws IOException if we can't stop listening
+         */
+        public void close() throws IOException {
+            listener.close();
+        }
+    }
+
     /**
      * The number of file handles available to us.
      *
@@ -289,23 +345,26 @@ public class TestExpect extends TestCase
     }
 
     /**
-     * Spawn a ton of stuff in the hope that we'll get an exception if we leak
-     * resources somewhere.
+     * Create a bunch of telnet spawns in the hope that we'll get an exception
+     * if we leak resources somewhere.
+     *
      * @throws Exception on trouble.
      */
     public void testSpawnLeaks3() throws Exception {
+        ConnectionsDropper dropper = new ConnectionsDropper();
         for (int i = 0; i < getLeakTestIterations(); i++) {
             try {
-                // FIXME: Test a TelnetSpawn
+                new ExpectJ().spawn("127.0.0.1", dropper.getListeningPort()).expectClose(1);
             } catch (Exception e) {
                 throw new Exception("Leak test 3 failed after " + i + " iterations", e);
             }
         }
+        dropper.close();
     }
 
     /**
-     * Spawn a ton of stuff in the hope that we'll get an exception if we leak
-     * resources somewhere.
+     * Spawn a ton of processes in the hope that we'll get an exception if we
+     * leak resources somewhere.
      * @throws Exception on trouble.
      */
     public void testSpawnLeaks4() throws Exception {
@@ -316,25 +375,6 @@ public class TestExpect extends TestCase
         long t0 = System.currentTimeMillis();
         for (int i = 0; i < getLeakTestIterations(); i += PARALLELLISM) {
             try {
-                if ((i > 0 && i % 30 == 0)
-                    || (i == getLeakTestIterations() - 1))
-                {
-                    // This takes a while, print some progress...
-                    long now = System.currentTimeMillis();
-                    double dSeconds = (now - t0) / 1000.0;
-                    double hz = i / dSeconds;
-                    int iterLeft = getLeakTestIterations() - i;
-                    double eta = iterLeft / hz;
-                    System.out.format("%4d/%d iterations done in %.1fs at %.1fHz, ETA: %.1fs\n",
-                        new Object[] {
-                        Integer.valueOf(i),
-                        Integer.valueOf(getLeakTestIterations()),
-                        Double.valueOf(dSeconds),
-                        Double.valueOf(hz),
-                        Double.valueOf(eta)
-                    });
-                }
-
                 Spawn spawns[] = new Spawn[PARALLELLISM];
                 for (int j = 0; j < spawns.length; j++) {
                     spawns[j] = getSpawnedProcess();
@@ -347,6 +387,26 @@ public class TestExpect extends TestCase
 
                 for (int j = 0; j < spawns.length; j++) {
                     spawns[j].expectClose(1);
+                }
+
+                boolean lastLap = (i + 1 == getLeakTestIterations());
+                boolean firstLap = (i == 0);
+                boolean everyNthLap = (i % (PARALLELLISM * 2) == 0);
+                if (lastLap || (everyNthLap && !firstLap)) {
+                    // This takes a while, print some progress...
+                    long now = System.currentTimeMillis();
+                    double dSeconds = (now - t0) / 1000.0;
+                    double hz = (i + 1) / dSeconds;
+                    int iterLeft = getLeakTestIterations() - i - 1;
+                    double eta = iterLeft / hz;
+                    System.out.format("%4d/%d iterations done in %.1fs at %.1fHz, ETA: %.1fs\n",
+                        new Object[] {
+                        Integer.valueOf(i + 1),
+                        Integer.valueOf(getLeakTestIterations()),
+                        Double.valueOf(dSeconds),
+                        Double.valueOf(hz),
+                        Double.valueOf(eta)
+                    });
                 }
             } catch (Exception e) {
                 throw new Exception("Leak test 4 failed after " + i + " iterations", e);
