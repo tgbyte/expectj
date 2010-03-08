@@ -57,6 +57,47 @@ Downloading
  {{{http://sourceforge.net/project/showfiles.php?group_id=98171}the
  Sourceforge download page}}
 
+Hacking
+
+ First of all, you need to
+ {{{http://wiki.bazaar.canonical.com/Download}install Bzr}} to get the
+ latest sources.
+
+ Then you need {{{http://maven.apache.org}Maven}} to build.  At the
+ time of this release Maven 2.2.1 was used for upstream development,
+ other versions may work fine as well.
+
+ To get the sources:
+
++-------------------------------+
+bzr branch bzr://expectj.bzr.sourceforge.net/bzrroot/expectj/trunk
++-------------------------------+
+
+ To create an Eclipse project:
+
++-------------------------------+
+mvn eclipse:eclipse
++-------------------------------+
+
+ To run the unit tests:
+
++-------------------------------+
+mvn test
++-------------------------------+
+
+ To commit any changes (don't forget to "bzr add" any new files
+ first):
+
++-------------------------------+
+bzr ci
++-------------------------------+
+
+ To generate a patch with your checked in changes:
+
++-------------------------------+
+bzr send -o expectj.patch
++-------------------------------+
+
 Licensing
 
  ExpectJ is released under the
