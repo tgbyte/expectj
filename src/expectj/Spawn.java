@@ -405,10 +405,9 @@ public class Spawn {
 
     /**
      * Allows the user to interact with the spawned process.
-     *
-     * @todo User input is echoed twice on the screen
      */
     public void interact() {
+        // FIXME: User input is echoed twice on the screen
         interactIn = new StreamPiper(null,
                                      System.in, slave.getStdin());
         interactIn.start();
