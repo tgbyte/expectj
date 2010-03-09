@@ -53,9 +53,9 @@ Downloading
 +-------------------------------+
 
  If you <really> don't want to use {{{http://maven.apache.org}Maven}},
- try your luck at
- {{{http://sourceforge.net/project/showfiles.php?group_id=98171}the
- Sourceforge download page}}
+ you can download jar files directly from
+ {{{http://repo1.maven.org/maven2/net/sourceforge/expectj/expectj/}Apache's
+ Maven repository}}
 
 Hacking
 
