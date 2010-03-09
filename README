@@ -7,4 +7,5 @@ http://expectj.sourceforge.net/
 
 To generate more up-to-date documentation now that you have the source
 code, do "mvn site" and open target/site/index.html in your favorite
-browser.
+browser.  The documentation front page is generated from
+site/apt/index.apt.
