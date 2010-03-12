@@ -48,9 +48,7 @@ class TelnetSpawn extends AbstractSpawnable implements Spawnable {
         m_remoteHost = InetAddress.getByName(remoteHostName);
     }
 
-    public void start()
-    throws IOException
-    {
+    public void start() throws IOException {
         m_socket = new Socket(m_remoteHost, m_remotePort);
         m_fromSocket = m_socket.getInputStream();
         m_toSocket = m_socket.getOutputStream();
