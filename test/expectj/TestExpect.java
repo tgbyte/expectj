@@ -373,6 +373,7 @@ public class TestExpect extends TestCase {
         final int PARALLELLISM = 10;
 
         long t0 = System.currentTimeMillis();
+        long lastProgressUpdate = t0;
         for (int i = 0; i < getLeakTestIterations(); i += PARALLELLISM) {
             try {
                 Spawn spawns[] = new Spawn[PARALLELLISM];
@@ -389,12 +390,9 @@ public class TestExpect extends TestCase {
                     spawns[j].expectClose(1);
                 }
 
-                boolean lastLap = (i + 1 == getLeakTestIterations());
-                boolean firstLap = (i == 0);
-                boolean everyNthLap = (i % (PARALLELLISM * 10) == 0);
-                if (lastLap || (everyNthLap && !firstLap)) {
-                    // This takes a while, print some progress...
-                    long now = System.currentTimeMillis();
+                long now = System.currentTimeMillis();
+                if (now - lastProgressUpdate > 3000) {
+                    // This takes a while, print some progress every 3s...
                     double dSeconds = (now - t0) / 1000.0;
                     double hz = (i + 1) / dSeconds;
                     int iterLeft = getLeakTestIterations() - i - 1;
@@ -407,6 +405,7 @@ public class TestExpect extends TestCase {
                         Double.valueOf(hz),
                         Double.valueOf(eta)
                     });
+                    lastProgressUpdate = now;
                 }
             } catch (Exception e) {
                 throw new Exception("Leak test 4 failed after " + i + " iterations", e);
