@@ -201,6 +201,9 @@ public class Spawn {
                 }
             }
         }
+        if (tm != null) {
+            tm.close();
+        }
         if (closed) {
             LOG.debug("Connection to spawn closed, continueReading="
                       + continueReading);

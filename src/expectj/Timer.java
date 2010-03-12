@@ -4,8 +4,7 @@ package expectj;
 /**
  * This class acts like a timer and invokes the listener on time-out.
  */
-class Timer implements Runnable
-{
+class Timer implements Runnable {
     /**
      * The time interval in milliseconds up to which the process
      * should be allowed to run.
@@ -48,6 +47,11 @@ class Timer implements Runnable
     private int currentStatus = NOT_STARTED;
 
     /**
+     * Are we there yet?
+     */
+    private boolean done = false;
+
+    /**
      * Constructor
      *
      * @param timeOut  Time interval after which the listener will be
@@ -84,27 +88,40 @@ class Timer implements Runnable
      * @return the status of the timer
      */
     public int getStatus() {
-
         return currentStatus;
-
     }
 
+    /**
+     * Close the timer prematurely.  The event listener won't get any
+     * notifications.
+     */
+    public void close() {
+        synchronized (this) {
+            done = true;
+            this.notify();
+        }
+    }
 
-    // Thread method
+    /**
+     * This is the timer thread main.
+     */
     public void run() {
-
         try {
             // Sleep for the specified time
-            Thread.sleep(timeOut);
-            // Jag Utha Shaitan, Its time to invoke the listener
-            currentStatus = TIMEDOUT;
-            listener.timerTimedOut();
-        }
-        catch (InterruptedException iexp) {
+            synchronized (this) {
+                this.wait(timeOut);
+                if (done) {
+                    // We've been nicely asked to quit
+                    return;
+                }
+
+                // Jag Utha Shaitan, Its time to invoke the listener
+                currentStatus = TIMEDOUT;
+                listener.timerTimedOut();
+            }
+        } catch (InterruptedException iexp) {
             currentStatus = INTERRUPTED;
             listener.timerInterrupted(iexp);
         }
-
     }
-
 }
