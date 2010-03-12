@@ -70,9 +70,10 @@ public class Spawn {
     private Selector stderrSelector;
 
     /**
-     * This object will be notified on timer timeout.
+     * This object will be notified on timer timeout or when the spawn we're
+     * waiting for closes.
      */
-    private final Object timeoutNotification = new Object();
+    private final Object doneWaitingForClose = new Object();
 
     /**
      * Constructor
@@ -116,8 +117,8 @@ public class Spawn {
         if (stderrSelector != null) {
             stderrSelector.wakeup();
         }
-        synchronized (timeoutNotification) {
-            timeoutNotification.notify();
+        synchronized (doneWaitingForClose) {
+            doneWaitingForClose.notify();
         }
     }
 
@@ -163,6 +164,13 @@ public class Spawn {
 
         LOG.debug("Waiting for spawn to close connection...");
         Timer tm = null;
+        slave.setCloseListener(new Spawnable.CloseListener() {
+            public void onClose() {
+                synchronized (doneWaitingForClose) {
+                    doneWaitingForClose.notify();
+                }
+            }
+        });
         if (timeOutSeconds != -1 ) {
             tm = new Timer(timeOutSeconds, new TimerEventListener() {
                 public void timerTimedOut() {
@@ -177,7 +185,7 @@ public class Spawn {
         }
         continueReading = true;
         boolean closed = false;
-        synchronized (timeoutNotification) {
+        synchronized (doneWaitingForClose) {
             while(continueReading) {
                 // Sleep if process is still running
                 if (slave.isClosed()) {
@@ -185,7 +193,7 @@ public class Spawn {
                     break;
                 } else {
                     try {
-                        timeoutNotification.wait(500);
+                        doneWaitingForClose.wait(500);
                     } catch (InterruptedException e) {
                         throw new ExpectJException("Interrupted waiting for spawn to finish",
                                                    e);

@@ -391,7 +391,7 @@ public class TestExpect extends TestCase {
 
                 boolean lastLap = (i + 1 == getLeakTestIterations());
                 boolean firstLap = (i == 0);
-                boolean everyNthLap = (i % (PARALLELLISM * 2) == 0);
+                boolean everyNthLap = (i % (PARALLELLISM * 10) == 0);
                 if (lastLap || (everyNthLap && !firstLap)) {
                     // This takes a while, print some progress...
                     long now = System.currentTimeMillis();

@@ -8,8 +8,11 @@ import java.nio.channels.Pipe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import expectj.Spawnable.CloseListener;
+
 /**
  * Helper class that wraps Spawnables to make them crunchier for ExpectJ to run.
+ *
  * @author Johan Walles
  */
 class SpawnableHelper
@@ -244,4 +247,14 @@ implements TimerEventListener
         return spawnErrToSystemErr.getCurrentContents();
     }
 
+    /**
+     * Register a listener that will be called when the spawnable we're wrapping
+     * closes.
+     *
+     * @param closeListener The listener that will be notified when this
+     * spawnable closes.
+     */
+    void setCloseListener(CloseListener closeListener) {
+        spawnable.setCloseListener(closeListener);
+    }
 }

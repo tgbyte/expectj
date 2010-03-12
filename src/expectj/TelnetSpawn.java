@@ -11,33 +11,32 @@ import java.net.UnknownHostException;
  * A Spawnable for controlling a telnet session using ExpectJ.
  * @author Johan Walles
  */
-class TelnetSpawn implements Spawnable
-{
+class TelnetSpawn extends AbstractSpawnable implements Spawnable {
     /**
      * A reference to the remote host.
      */
     private InetAddress m_remoteHost;
-    
+
     /**
      * The port we're talking to on the remote host.
      */
     private int m_remotePort;
-    
+
     /**
      * Our communications channel to the remote host.
      */
     private Socket m_socket;
-    
+
     /**
      * Use this to read data from the remote host.
      */
     private InputStream m_fromSocket;
-    
+
     /**
      * Use this to write data to the remote host.
      */
     private OutputStream m_toSocket;
-    
+
     /**
      * Construct a new telnet spawn.
      * @param remoteHostName The remote host to connect to.
@@ -48,7 +47,7 @@ class TelnetSpawn implements Spawnable
         m_remotePort = remotePort;
         m_remoteHost = InetAddress.getByName(remoteHostName);
     }
-    
+
     public void start()
     throws IOException
     {
@@ -65,8 +64,7 @@ class TelnetSpawn implements Spawnable
         return m_toSocket;
     }
 
-    public InputStream getStderr()
-    {
+    public InputStream getStderr() {
         return null;
     }
 
@@ -88,7 +86,7 @@ class TelnetSpawn implements Spawnable
         if (m_socket == null) {
             return;
         }
-        
+
         try {
             m_socket.close();
         } catch (IOException ignored) {

@@ -12,9 +12,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Sachin Shekar Shetty
  * @author Johan Walles
  */
-class ProcessSpawn
-implements Spawnable
-{
+public class ProcessSpawn extends AbstractSpawnable implements Spawnable {
     /**
      * Log messages go here.
      */
@@ -102,10 +100,10 @@ implements Spawnable
     }
 
     /**
-     * This class is responsible for executing the process in a seperate
+     * This class is responsible for executing the process in a separate
      * thread.
      */
-    static class ProcessThread implements Runnable {
+    class ProcessThread implements Runnable {
         /**
          * Process object for execution of the commandLine
          */
@@ -162,6 +160,7 @@ implements Spawnable
                 process.waitFor();
                 exitValue = process.exitValue();
                 isClosed = true;
+                onClose();
             } catch (Exception e) {
                 LOG.error("Failed waiting for process termination", e);
             }
