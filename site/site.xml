@@ -3,7 +3,6 @@
   <version position="left"/>
   <body>
     <links>
-      <item name="Expect" href="http://expect.nist.gov/" />
       <item name="Sourceforge Project" href="http://sourceforge.net/projects/expectj"/>
     </links>
 
