@@ -106,6 +106,13 @@ bzr merge
 bzr ci
 +-------------------------------+
 
+ To see what changes you have that upstream doesn't and the other way
+ around:
+
++-------------------------------+
+bzr missing
++-------------------------------+
+
 Licensing
 
  ExpectJ is released under the
