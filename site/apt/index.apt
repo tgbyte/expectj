@@ -76,6 +76,7 @@ bzr branch bzr://expectj.bzr.sourceforge.net/bzrroot/expectj/trunk
  To create an Eclipse project:
 
 +-------------------------------+
+cd trunk
 mvn eclipse:eclipse
 +-------------------------------+
 
@@ -96,6 +97,13 @@ bzr ci
 
 +-------------------------------+
 bzr send -o expectj.patch
++-------------------------------+
+
+ To update your branch with the latest changes from upstream:
+
++-------------------------------+
+bzr merge
+bzr ci
 +-------------------------------+
 
 Licensing
