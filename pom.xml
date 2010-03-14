@@ -194,6 +194,9 @@
         <artifactId>maven-release-plugin</artifactId>
 	<version>2.0</version>
 	<configuration>
+	  <!-- Due to MRELEASE-459 this doesn't work, and you need to
+	  specify the "release" profile manually on the command line
+	  -->
 	  <releaseProfiles>release</releaseProfiles>
 	</configuration>
       </plugin>
