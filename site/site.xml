@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
+  <version position="left"/>
   <body>
     <links>
       <item name="Expect" href="http://expect.nist.gov/" />

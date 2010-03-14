@@ -85,8 +85,8 @@ mvn eclipse:eclipse
 mvn test
 +-------------------------------+
 
- To commit any changes (don't forget to "bzr add" any new files
- first):
+ To commit any changes to your local branch (don't forget to "bzr add"
+ any new files first):
 
 +-------------------------------+
 bzr ci
