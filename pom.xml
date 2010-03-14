@@ -198,6 +198,9 @@
 	  specify the "release" profile manually on the command line
 	  -->
 	  <releaseProfiles>release</releaseProfiles>
+
+	  <!-- Workaround for MGPG-9 -->
+	  <mavenExecutorId>forked-path</mavenExecutorId>
 	</configuration>
       </plugin>
 
