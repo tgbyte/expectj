@@ -3,7 +3,7 @@
   <groupId>net.sourceforge.expectj</groupId>
   <artifactId>expectj</artifactId>
   <packaging>jar</packaging>
-  <version>2.0.2</version>
+  <version>2.0.3-SNAPSHOT</version>
   <name>ExpectJ</name>
   <description>ExpectJ is a Java re-implementation of the venerable
   TCL Expect utility. It can be used to script interaction with either
