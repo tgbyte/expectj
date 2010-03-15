@@ -214,7 +214,7 @@ implements TimerEventListener
     }
 
     /**
-     * If the spawn representes by this object has already exited, it
+     * If the spawn represented by this object has already exited, it
      * returns the exit code. isClosed() should be used in conjunction
      * with this method.
      * @return The exit code from the exited spawn.

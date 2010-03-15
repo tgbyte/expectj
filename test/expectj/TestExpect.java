@@ -294,6 +294,8 @@ public class TestExpect extends TestCase {
         process.expectClose();
         process.stop();
         assertTrue("Process wasn't closed after stop", process.isClosed());
+
+        assertEquals(0, process.getExitValue());
     }
 
     /**
@@ -308,6 +310,8 @@ public class TestExpect extends TestCase {
         process.send("quit\n");
         process.expectClose();
         assertTrue("Process wasn't closed after finishing", process.isClosed());
+
+        assertEquals(0, process.getExitValue());
     }
 
     /**
