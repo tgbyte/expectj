@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,7 +12,6 @@ import java.util.List;
 
 import org.mockito.Mockito;
 
-import expectj.test.StagedSpawnable;
 
 import junit.framework.TestCase;
 
@@ -23,61 +20,6 @@ import junit.framework.TestCase;
  * @author johan.walles@gmail.com
  */
 public class TestExpect extends TestCase {
-    /**
-     * Accepts connections on a port and closes them immediately.
-     *
-     * @author johan.walles@gmail.com
-     */
-    private static class ConnectionsDropper {
-        /**
-         * The server socket we're listening on.
-         */
-        private ServerSocket listener;
-
-        /**
-         * Create a new connections dropper.
-         *
-         * @throws IOException If we're unable to open a port to listen to.
-         */
-        public ConnectionsDropper() throws IOException {
-            listener = new ServerSocket(0);
-
-            String threadName =
-                "Connections dropper , (port " + listener.getLocalPort() + ")";
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        while (true) {
-                            Socket incoming = listener.accept();
-                            incoming.close();
-                        }
-                    } catch (IOException e) {
-                        // Just quit listening if we fail, it probably means
-                        // somebody closed our socket on purpose.
-                    }
-                }
-            }, threadName).start();
-        }
-
-        /**
-         * Which port are we listening to?
-         *
-         * @return The local port we're listening to.
-         */
-        public int getListeningPort() {
-            return listener.getLocalPort();
-        }
-
-        /**
-         * Stop listening for connections.
-         *
-         * @throws IOException if we can't stop listening
-         */
-        public void close() throws IOException {
-            listener.close();
-        }
-    }
-
     /**
      * The number of file handles available to us.
      *
@@ -359,6 +301,31 @@ public class TestExpect extends TestCase {
             } catch (Exception e) {
                 throw new Exception("Leak test 2 failed after " + i + " iterations", e);
             }
+        }
+    }
+
+    /**
+     * Verify {@link TelnetSpawn} behavior.
+     *
+     * @throws Exception if testing goes really bad
+     */
+    public void testTelnetSpawn() throws Exception {
+        ConnectionsDropper dropper = new ConnectionsDropper();
+        try {
+            Spawn spawn =
+                new ExpectJ().spawn("127.0.0.1", dropper.getListeningPort());
+
+            // Expecting close when already closed should return immediately
+            spawn.expectClose();
+
+            // Stopping a closed spawn should be a no-op
+            spawn.stop();
+
+            // Telnet exit value is always 0
+            assertEquals(0, spawn.getExitValue());
+        } finally {
+            dropper.close();
+            dropper = null;
         }
     }
 

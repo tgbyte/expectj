@@ -1,4 +1,4 @@
-package expectj.test;
+package expectj;
 
 import java.io.IOException;
 import java.io.InputStream;
