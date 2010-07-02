@@ -310,7 +310,7 @@ public class TestExpect extends TestCase {
      * @throws Exception if testing goes really bad
      */
     public void testTelnetSpawn() throws Exception {
-        ConnectionsDropper dropper = new ConnectionsDropper();
+        StagedTelnetSpawnable dropper = new StagedTelnetSpawnable();
         try {
             Spawn spawn =
                 new ExpectJ().spawn("127.0.0.1", dropper.getListeningPort());
@@ -327,6 +327,26 @@ public class TestExpect extends TestCase {
             dropper.close();
             dropper = null;
         }
+
+        StringServer stager = new StringServer(new String[] {
+            "gris", "hej"
+        });
+
+        try {
+            Spawn spawn =
+                new ExpectJ().spawn("127.0.0.1", stager.getListeningPort());
+            spawn.expect("gris");
+            spawn.expectClose();
+
+            // Stopping a closed spawn should be a no-op
+            spawn.stop();
+
+            // Telnet exit value is always 0
+            assertEquals(0, spawn.getExitValue());
+        } finally {
+            stager.close();
+            stager = null;
+        }
     }
 
     /**
@@ -336,7 +356,7 @@ public class TestExpect extends TestCase {
      * @throws Exception on trouble.
      */
     public void testSpawnLeaks3() throws Exception {
-        ConnectionsDropper dropper = new ConnectionsDropper();
+        StagedTelnetSpawnable dropper = new StagedTelnetSpawnable();
         for (int i = 0; i < getLeakTestIterations(); i++) {
             try {
                 new ExpectJ().spawn("127.0.0.1", dropper.getListeningPort()).expectClose(1);
