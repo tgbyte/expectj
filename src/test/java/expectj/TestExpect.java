@@ -310,7 +310,7 @@ public class TestExpect extends TestCase {
      * @throws Exception if testing goes really bad
      */
     public void testTelnetSpawn() throws Exception {
-        StagedTelnetSpawnable dropper = new StagedTelnetSpawnable();
+        StringServer dropper = new StringServer();
         try {
             Spawn spawn =
                 new ExpectJ().spawn("127.0.0.1", dropper.getListeningPort());
@@ -356,7 +356,7 @@ public class TestExpect extends TestCase {
      * @throws Exception on trouble.
      */
     public void testSpawnLeaks3() throws Exception {
-        StagedTelnetSpawnable dropper = new StagedTelnetSpawnable();
+        StringServer dropper = new StringServer();
         for (int i = 0; i < getLeakTestIterations(); i++) {
             try {
                 new ExpectJ().spawn("127.0.0.1", dropper.getListeningPort()).expectClose(1);

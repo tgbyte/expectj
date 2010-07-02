@@ -120,7 +120,6 @@
           <reportSet>
             <reports>
               <report>javadoc</report>
-              <!-- <report>test-javadoc</report> -->
             </reports>
           </reportSet>
         </reportSets>
@@ -149,10 +148,6 @@
   </reporting>
 
   <build>
-    <!-- We have sources in non-standard locations -->
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-
     <!-- Include licensing information in the jar -->
     <resources>
       <resource>
