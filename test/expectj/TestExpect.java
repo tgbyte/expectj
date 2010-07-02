@@ -165,6 +165,20 @@ public class TestExpect extends TestCase {
     }
 
     /**
+     * Verify {@link Spawn#getCurrentStandardOutContents()}.
+     *
+     * @throws Exception if things go wrong.
+     */
+    public void testGetStdOut() throws Exception {
+        Spawn testMe = getSpawn(new String[] {"flaska", "gris"});
+        testMe.expect("flaska");
+        testMe.expect("gris");
+        assertEquals("flaskagris", testMe.getCurrentStandardOutContents());
+        testMe.expectClose();
+        assertEquals("flaskagris", testMe.getCurrentStandardOutContents());
+    }
+
+    /**
      * Test that we time out properly when we don't find what we're looking for.
      * @throws Exception if things go wrong.
      */
