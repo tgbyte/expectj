@@ -98,6 +98,21 @@ public class TestExpect extends TestCase {
     }
 
     /**
+     * Verify that we get an exception if we don't get any match.
+     *
+     * @throws Exception if testing goes exceptionally wrong.
+     */
+    public void testNoMatchFound() throws Exception {
+        Spawn spawn = getSpawn(new String[0]);
+        try {
+            spawn.expect("won't be found");
+            fail("Expected IO exception if stream closed before match");
+        } catch (IOException e) {
+            // Expected exception intentionally ignored
+        }
+    }
+
+    /**
      * Test that we get notified about closes.
      * @throws Exception if things go wrong.
      */
