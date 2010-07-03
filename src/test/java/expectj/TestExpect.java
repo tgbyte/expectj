@@ -336,7 +336,11 @@ public class TestExpect extends TestCase {
             Spawn spawn =
                 new ExpectJ().spawn("127.0.0.1", stager.getListeningPort());
             spawn.expect("gris");
+            assertEquals("gris", spawn.getCurrentStandardOutContents());
+            Thread.sleep(1000);  // 1000ms = twice the interval used by the StringServer
+            assertEquals("grishej", spawn.getCurrentStandardOutContents());
             spawn.expectClose();
+            assertEquals("grishej", spawn.getCurrentStandardOutContents());
 
             // Stopping a closed spawn should be a no-op
             spawn.stop();

@@ -314,7 +314,7 @@ public class Spawn {
             buffer.rewind();
             if (readMe.read(buffer) == -1) {
                 // End of stream
-                break;
+                throw new IOException("End of stream reached, no match found");
             }
             buffer.rewind();
             for (int i = 0; i < buffer.limit(); i++) {

@@ -62,6 +62,7 @@ class StringServer {
                             for (int i = 0; i < strings.length; i++) {
                                 Thread.sleep(500);
                                 out.append(strings[i]);
+                                out.flush();
                             }
                         }
                         incoming.close();
