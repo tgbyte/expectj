@@ -80,11 +80,9 @@ public class Spawn {
      *
      * @param spawn This is what we'll control.
      * @param lDefaultTimeOutSeconds Default timeout for expect commands
-     * @throws Exception on trouble launching the spawn
+     * @throws IOException on trouble launching the spawn
      */
-    Spawn(Spawnable spawn, long lDefaultTimeOutSeconds)
-    throws Exception
-    {
+    Spawn(Spawnable spawn, long lDefaultTimeOutSeconds) throws IOException {
         if (lDefaultTimeOutSeconds < -1) {
             throw new IllegalArgumentException("Timeout must be >= -1, was "
                                                + lDefaultTimeOutSeconds);

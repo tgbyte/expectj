@@ -131,9 +131,9 @@ implements TimerEventListener
      * limit.  It tells the spawnable to start, and starts the timer when
      * enabled. It starts the piped streams to enable copying of spawn
      * stream contents to standard streams.
-     * @throws Exception if launching the spawnable fails
+     * @throws IOException if launching the spawnable fails
      */
-    void start() throws Exception {
+    void start() throws IOException {
         // Start the spawnable and timer if needed
         spawnable.start();
         if (timer != null) {

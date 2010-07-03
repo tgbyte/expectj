@@ -36,9 +36,9 @@ public class ExpectJ {
      *
      * @param spawnable spawnable to be executed
      * @return The newly spawned process
-     * @throws Exception if the spawning fails
+     * @throws IOException if the spawning fails
      */
-    public Spawn spawn(Spawnable spawnable) throws Exception {
+    public Spawn spawn(Spawnable spawnable) throws IOException {
         return new Spawn(spawnable, m_lDefaultTimeOutSeconds);
     }
 
@@ -48,10 +48,10 @@ public class ExpectJ {
      *
      * @param command command to be executed
      * @return The newly spawned process
-     * @throws Exception if the process spawning fails
+     * @throws IOException if the process spawning fails
      * @see Runtime#exec(String)
      */
-    public Spawn spawn(final String command) throws Exception {
+    public Spawn spawn(final String command) throws IOException {
         return spawn(new ProcessSpawn(new Executor() {
             public Process execute() throws IOException {
                 return Runtime.getRuntime().exec(command);
@@ -69,11 +69,10 @@ public class ExpectJ {
      *
      * @param executor Will be called upon to start the new process
      * @return The newly spawned process
-     * @throws Exception if the process spawning fails
+     * @throws IOException if the process spawning fails
      * @see Runtime#exec(String[])
      */
-    public Spawn spawn(Executor executor)
-    throws Exception
+    public Spawn spawn(Executor executor) throws IOException
     {
         return spawn(new ProcessSpawn(executor));
     }
@@ -86,14 +85,14 @@ public class ExpectJ {
      * @param hostName The name of the host to connect to.
      * @param port The remote port to connect to.
      * @return The newly spawned telnet session.
-     * @throws Exception if the telnet spawning fails
+     * @throws IOException if the telnet spawning fails
      * @throws UnknownHostException if you specify a bogus host name
      *
      * @see TelnetSpawn
      * @see SshSpawn
      */
     public Spawn spawn(String hostName, int port)
-    throws Exception, UnknownHostException
+    throws IOException
     {
         return spawn(new TelnetSpawn(hostName, port));
     }

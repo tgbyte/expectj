@@ -1,5 +1,6 @@
 package expectj;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -14,9 +15,9 @@ public interface Spawnable
      * This method launches the {@link Spawn}.  It starts the
      * {@link StreamPiper}s that enable copying of process stream contents to
      * standard streams.
-     * @throws Exception on trouble.
+     * @throws IOException on trouble.
      */
-    public void start() throws Exception;
+    public void start() throws IOException;
 
     /**
      * Get a stream from which the {@link Spawn}'s stdout can be read.
