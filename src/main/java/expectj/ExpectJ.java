@@ -88,6 +88,9 @@ public class ExpectJ {
      * @return The newly spawned telnet session.
      * @throws Exception if the telnet spawning fails
      * @throws UnknownHostException if you specify a bogus host name
+     *
+     * @see TelnetSpawn
+     * @see SshSpawn
      */
     public Spawn spawn(String hostName, int port)
     throws Exception, UnknownHostException
