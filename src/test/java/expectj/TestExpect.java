@@ -436,4 +436,52 @@ public class TestExpect extends TestCase {
             }
         }
     }
+
+    /**
+     * Spawn a ton of processes and then stop them in the hope that we'll get an
+     * exception if we leak resources somewhere.
+     *
+     * @throws Exception on trouble.
+     */
+    public void testSpawnLeaks5() throws Exception {
+        // Spawn several processes in parallel as it goes a lot faster than
+        // doing one at a time.  More than 10 didn't help.
+        final int PARALLELLISM = 10;
+
+        long t0 = System.currentTimeMillis();
+        long lastProgressUpdate = t0;
+        for (int i = 0; i < getLeakTestIterations(); i += PARALLELLISM) {
+            try {
+                Spawn spawns[] = new Spawn[PARALLELLISM];
+                for (int j = 0; j < spawns.length; j++) {
+                    spawns[j] = getSpawnedProcess();
+                }
+
+                // Kill it!
+                for (int j = 0; j < spawns.length; j++) {
+                    spawns[j].stop();
+                }
+
+                long now = System.currentTimeMillis();
+                if (now - lastProgressUpdate > 3000) {
+                    // This takes a while, print some progress every 3s...
+                    double dSeconds = (now - t0) / 1000.0;
+                    double hz = (i + 1) / dSeconds;
+                    int iterLeft = getLeakTestIterations() - i - 1;
+                    double eta = iterLeft / hz;
+                    System.out.format("%4d/%d iterations done in %.1fs at %.1fHz, ETA: %.1fs\n",
+                        new Object[] {
+                        Integer.valueOf(i + 1),
+                        Integer.valueOf(getLeakTestIterations()),
+                        Double.valueOf(dSeconds),
+                        Double.valueOf(hz),
+                        Double.valueOf(eta)
+                    });
+                    lastProgressUpdate = now;
+                }
+            } catch (Exception e) {
+                throw new Exception("Leak test 5 failed after " + i + " iterations", e);
+            }
+        }
+    }
 }

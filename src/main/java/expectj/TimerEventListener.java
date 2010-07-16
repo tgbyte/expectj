@@ -5,13 +5,14 @@ package expectj;
  */
 interface TimerEventListener {
     /**
-     * This method represents the time-out event triggered by Timer.
+     * Called when the timer times out.
      */
     void timerTimedOut();
 
     /**
      * This method is invoked by the Timer, when the timer thread
      * receives an interrupted exception.
+     *
      * @param reason Why we were interrupted.
      */
     void timerInterrupted(InterruptedException reason);

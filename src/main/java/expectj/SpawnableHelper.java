@@ -72,10 +72,6 @@ implements TimerEventListener
      */
     private StreamPiper spawnErrToSystemErr = null;
 
-    /**
-     * Time callback method
-     * This method is invoked when the time-out occurr
-     */
     public void timerTimedOut() {
         stop();
     }
@@ -89,11 +85,13 @@ implements TimerEventListener
             spawnErrToSystemErr.stopProcessing();
         }
         spawnable.stop();
+        close();
     }
 
     /**
      * This method is invoked by the {@link Timer}, when the timer thread
      * receives an interrupted exception.
+     *
      * @param reason The reason we were interrupted.
      */
     public void timerInterrupted(InterruptedException reason) {
@@ -161,10 +159,10 @@ implements TimerEventListener
 
     /**
      * Shut down operations and free system resources.
-     *
-     * @throws IOException On trouble shutting down.
+     * <p>
+     * Any exception on closing resources will be logged.
      */
-    void close() throws IOException {
+    void close() {
         if (spawnErrToSystemErr != null) {
             spawnErrToSystemErr.stopProcessing();
         }
@@ -172,12 +170,28 @@ implements TimerEventListener
             spawnOutToSystemOut.stopProcessing();
         }
         if (systemOut != null) {
-            systemOut.sink().close();
-            systemOut.source().close();
+            try {
+                systemOut.sink().close();
+            } catch (IOException e) {
+                LOG.warn("Closing stdout sink failed", e);
+            }
+            try {
+                systemOut.source().close();
+            } catch (IOException e) {
+                LOG.warn("Closing stdout source failed", e);
+            }
         }
         if (systemErr != null) {
-            systemErr.sink().close();
-            systemErr.source().close();
+            try {
+                systemErr.sink().close();
+            } catch (IOException e) {
+                LOG.warn("Closing stderr sink failed", e);
+            }
+            try {
+                systemErr.source().close();
+            } catch (IOException e) {
+                LOG.warn("Closing stderr source failed", e);
+            }
         }
     }
 

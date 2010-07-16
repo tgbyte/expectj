@@ -216,7 +216,13 @@ public class Spawn {
             throw new TimeoutException("Timeout waiting for spawn to finish");
         }
 
-        // Free up no-longer-used system resources
+        freeResources();
+    }
+
+    /**
+     * Free up system resources.
+     */
+    private void freeResources() {
         try {
             slave.close();
             if (interactIn != null) {
@@ -435,16 +441,9 @@ public class Spawn {
      * This method kills the process represented by SpawnedProcess object.
      */
     public void stop() {
-        if (interactIn != null) {
-            interactIn.stopProcessing();
-        }
-        if (interactOut != null) {
-            interactOut.stopProcessing();
-        }
-        if (interactErr != null) {
-            interactErr.stopProcessing();
-        }
         slave.stop();
+
+        freeResources();
     }
 
     /**
