@@ -3,6 +3,8 @@ package expectj;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import com.jcraft.jsch.Channel;
+
 /**
  * This class is the starting point of the ExpectJ Utility. This class
  * acts as factory for all {@link Spawn}s.
@@ -95,5 +97,20 @@ public class ExpectJ {
     throws IOException
     {
         return spawn(new TelnetSpawn(hostName, port));
+    }
+
+    /**
+     * This method creates a spawn that controls an SSH connection.
+     *
+     * @param channel The SSH channel to control.
+     *
+     * @return A spawn controlling the SSH channel.
+     *
+     * @throws IOException If taking control over the SSH channel fails.
+     *
+     * @see SshSpawn#SshSpawn(Channel)
+     */
+    public Spawn spawn(Channel channel) throws IOException {
+        return spawn(new SshSpawn(channel));
     }
 }

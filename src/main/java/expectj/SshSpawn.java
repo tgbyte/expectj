@@ -30,12 +30,12 @@ public class SshSpawn extends AbstractSpawnable implements Spawnable {
     /**
      * Use this to read data from the remote host.
      */
-    private InputStream m_fromSocket;
+    private OutputStream m_fromSocket;
 
     /**
      * Use this to write data to the remote host.
      */
-    private OutputStream m_toSocket;
+    private InputStream m_toSocket;
 
     /**
      * The username with which to authenticate
@@ -66,7 +66,36 @@ public class SshSpawn extends AbstractSpawnable implements Spawnable {
         this.m_password = password ;
     }
 
+    /**
+     * Takes control over an existing SSH channel.
+     *
+     * @param channel The channel we should control.  If this channel isn't
+     * already connected, {@link Channel#connect()} will be called.
+     *
+     * @throws IOException If connecting the channel fails.
+     */
+    public SshSpawn(Channel channel) throws IOException {
+        if (!channel.isConnected()) {
+            try {
+                channel.connect();
+            } catch (JSchException e) {
+                throw new IOException("Failed connecting the channel", e) ;
+            }
+        }
+
+        this.m_channel = channel;
+        m_toSocket = m_channel.getInputStream();
+        m_fromSocket = m_channel.getOutputStream();
+    }
+
     public void start() throws IOException {
+        if (m_toSocket != null) {
+            // We've probably been created by the SshSpawn(Channel) constructor,
+            // or start() has already been called.  No need to do anything
+            // anyway.
+            return;
+        }
+
     	try {
 			m_session = new JSch().getSession(m_username, m_remoteHost, m_remotePort) ;
 			m_session.setPassword(m_password) ;
@@ -75,18 +104,18 @@ public class SshSpawn extends AbstractSpawnable implements Spawnable {
 			m_channel = m_session.openChannel("shell") ;
 			m_channel.connect() ;
 		} catch (JSchException e) {
-			throw new IOException("Unable to establish SSH session/channel",e) ;
+			throw new IOException("Unable to establish SSH session/channel", e) ;
 		}
-        m_fromSocket = m_channel.getInputStream() ;
-        m_toSocket = m_channel.getOutputStream();
+        m_toSocket = m_channel.getInputStream() ;
+        m_fromSocket = m_channel.getOutputStream();
     }
 
     public InputStream getStdout() {
-        return m_fromSocket;
+        return m_toSocket;
     }
 
     public OutputStream getStdin() {
-        return m_toSocket;
+        return m_fromSocket;
     }
 
     public InputStream getStderr() {
@@ -112,12 +141,14 @@ public class SshSpawn extends AbstractSpawnable implements Spawnable {
             return;
         }
 
-        m_channel.disconnect() ;
-		m_channel = null ;
-        m_channel = null;
-        m_session.disconnect() ;
-        m_session = null ;
-        m_fromSocket = null;
+        m_channel.disconnect();
+		m_channel = null;
+
+		if (m_session != null) {
+		    m_session.disconnect();
+		    m_session = null;
+		}
         m_toSocket = null;
+        m_fromSocket = null;
     }
 }
