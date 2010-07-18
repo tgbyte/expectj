@@ -91,7 +91,8 @@ public class ExpectJ {
      * @throws UnknownHostException if you specify a bogus host name
      *
      * @see TelnetSpawn
-     * @see SshSpawn
+     * @see #spawn(String, int, String, String)
+     * @see #spawn(Channel)
      */
     public Spawn spawn(String hostName, int port)
     throws IOException
@@ -108,9 +109,34 @@ public class ExpectJ {
      *
      * @throws IOException If taking control over the SSH channel fails.
      *
+     * @see #spawn(String, int, String, String)
+     *
      * @see SshSpawn#SshSpawn(Channel)
      */
     public Spawn spawn(Channel channel) throws IOException {
         return spawn(new SshSpawn(channel));
+    }
+
+    /**
+     * This method creates a spawn that controls an SSH connection.
+     *
+     * @param remoteHostName The remote host to connect to.
+     *
+     * @param remotePort The remote port to connect to.
+     *
+     * @param userName The user name with which to authenticate
+     *
+     * @param password The password with which to authenticate
+     *
+     * @return A spawn controlling the SSH channel.
+     *
+     * @throws IOException If taking control over the SSH channel fails.
+     *
+     * @see #spawn(Channel)
+     *
+     * @see SshSpawn#SshSpawn(String, int, String, String)
+     */
+    public Spawn spawn(String remoteHostName, int remotePort, String userName, String password) throws IOException {
+        return spawn(new SshSpawn(remoteHostName, remotePort, userName, password));
     }
 }
