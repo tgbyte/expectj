@@ -28,7 +28,7 @@ shell.expectClose();
 
  On timeout a TimeoutException will be thrown.
 
- More usage information is in the {{{apidocs/index.html}javadocs}}.
+ More usage information is in the {{{./apidocs/index.html}javadocs}}.
 
 Downloading
 
