@@ -254,7 +254,7 @@
       <id>expectj</id>
       <name>ExpectJ Sourceforge Repository</name>
       <uniqueVersion>false</uniqueVersion>
-      <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2repo</url>
+      <url>sftp://frs.sf.net/home/groups/e/ex/expectj/htdocs/m2repo</url>
     </repository>
 
     <!-- Deploy snapshots to http://expectj.sf.net/m2snapshot -->
@@ -262,13 +262,13 @@
       <id>expectj</id>
       <name>ExpectJ Sourceforge Snapshot Repository</name>
       <uniqueVersion>false</uniqueVersion>
-      <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs/m2snapshot</url>
+      <url>sftp://frs.sf.net/home/groups/e/ex/expectj/htdocs/m2snapshot</url>
     </snapshotRepository>
 
     <!-- Deploy web site to http://expectj.sf.net -->
     <site>
       <id>expectj</id>
-      <url>scp://shell.sf.net/home/groups/e/ex/expectj/htdocs</url>
+      <url>sftp://frs.sf.net/home/groups/e/ex/expectj/htdocs</url>
     </site>
   </distributionManagement>
 </project>
