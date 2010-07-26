@@ -229,6 +229,16 @@
           </archive>
 	</configuration>
       </plugin>
+      
+      <plugin>
+        <!-- Everything we have is UTF-8 encoded -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
