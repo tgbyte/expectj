@@ -130,6 +130,7 @@
         </reportSets>
 	<configuration>
           <detectLinks>true</detectLinks>
+          <quiet>true</quiet>
 	</configuration>
       </plugin>
 
