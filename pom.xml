@@ -129,9 +129,7 @@
           </reportSet>
         </reportSets>
 	<configuration>
-	  <links>
-	    <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
-	  </links>
+          <detectLinks>true</detectLinks>
 	</configuration>
       </plugin>
 
