@@ -1,12 +1,12 @@
 package expectj;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is responsible for piping the output of one stream to the
@@ -138,8 +138,10 @@ class StreamPiper extends Thread implements Runnable {
                     outputStream.close();
                     return;
                 }
+                synchronized (this) {
+                    sCurrentOut.append(new String(buffer, 0, bytes_read));
+                }
                 outputStream.write(buffer, 0, bytes_read);
-                sCurrentOut.append(new String(buffer, 0, bytes_read));
                 if (copyStream != null && !getPipingPaused()) {
                     copyStream.write(buffer, 0, bytes_read);
                     copyStream.flush();
