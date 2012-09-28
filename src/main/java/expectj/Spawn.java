@@ -316,14 +316,13 @@ public class Spawn {
             }
 
             buffer.rewind();
-            if (readMe.read(buffer) == -1) {
+            int readCount = readMe.read(buffer);
+            if (readCount == -1) {
                 // End of stream
                 throw new IOException("End of stream reached, no match found");
             }
             buffer.rewind();
-            for (int i = 0; i < buffer.limit(); i++) {
-                line.append((char)buffer.get(i));
-            }
+            line.append(new String(buffer.array(), buffer.arrayOffset(), readCount, "ISO-8859-1"));
             if (line.toString().trim().toUpperCase().indexOf(pattern.toUpperCase()) != -1) {
                 LOG.debug("Found match for " + pattern + ":" + line);
                 found = true;
