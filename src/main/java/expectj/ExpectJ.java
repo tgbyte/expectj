@@ -1,9 +1,9 @@
 package expectj;
 
+import com.jcraft.jsch.Channel;
+
 import java.io.IOException;
 import java.net.UnknownHostException;
-
-import com.jcraft.jsch.Channel;
 
 /**
  * This class is the starting point of the ExpectJ Utility. This class
@@ -13,23 +13,37 @@ import com.jcraft.jsch.Channel;
  */
 public class ExpectJ {
     /** Default timeout, -1 indicating wait for indefinite time */
-    private long m_lDefaultTimeOutSeconds = -1;
+    private final long m_lDefaultTimeOutSeconds;
+
+    /** Echo spawn output to the console. */
+    private final boolean m_bEcho;
 
     /**
-     * Create a new ExpectJ with specified timeout setting.
+     * Create a new ExpectJ with specified timeout setting and console echo enabled.
      * @param defaultTimeoutSeconds default time out in seconds for the expect
      * commands on the spawned process.  -1 default time out indicates
      * indefinite timeout.
      */
     public ExpectJ(long defaultTimeoutSeconds) {
-        m_lDefaultTimeOutSeconds = defaultTimeoutSeconds;
+        this(defaultTimeoutSeconds, true);
     }
 
     /**
-     * Create a new ExpectJ with an infinite timeout.
+     * Create a new ExpectJ with specified timeout setting.
+     * @param defaultTimeoutSeconds default time out in seconds for the expect
+     * commands on the spawned process.  -1 default time out indicates
+     * @param echo indicates whether the spawn output is echoed to the console.
+     */
+    public ExpectJ(long defaultTimeoutSeconds, boolean echo) {
+        m_lDefaultTimeOutSeconds = defaultTimeoutSeconds;
+        m_bEcho = echo;
+    }
+
+    /**
+     * Create a new ExpectJ with an infinite timeout and console echo enabled.
      */
     public ExpectJ() {
-        // This constructor intentionally left blank
+        this(-1, true);
     }
 
     /**
@@ -41,7 +55,7 @@ public class ExpectJ {
      * @throws IOException if the spawning fails
      */
     public Spawn spawn(Spawnable spawnable) throws IOException {
-        return new Spawn(spawnable, m_lDefaultTimeOutSeconds);
+        return new Spawn(spawnable, m_lDefaultTimeOutSeconds, m_bEcho);
     }
 
     /**

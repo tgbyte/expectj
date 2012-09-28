@@ -1,14 +1,13 @@
 package expectj;
 
+import expectj.Spawnable.CloseListener;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import expectj.Spawnable.CloseListener;
 
 /**
  * Helper class that wraps Spawnables to make them crunchier for ExpectJ to run.
@@ -28,11 +27,13 @@ implements TimerEventListener
      */
     private Spawnable spawnable;
 
+    private final boolean echo;
+
     /**
      * @param timeOutSeconds time interval in seconds to be allowed for spawn execution
      * @param runMe the spawnable to execute
      */
-    SpawnableHelper(Spawnable runMe, long timeOutSeconds) {
+    SpawnableHelper(Spawnable runMe, long timeOutSeconds, boolean echo) {
         if (timeOutSeconds < -1) {
             throw new IllegalArgumentException("Time-out is invalid");
         }
@@ -40,13 +41,7 @@ implements TimerEventListener
             timer = new Timer(timeOutSeconds, this);
         }
         this.spawnable = runMe;
-    }
-
-    /**
-     * @param runMe the spawnable to execute
-     */
-    SpawnableHelper(Spawnable runMe) {
-        this(runMe, -1);
+        this.echo = echo;
     }
 
     /** Timer object to monitor our Spawnable */
@@ -141,7 +136,7 @@ implements TimerEventListener
         // Starting the piped streams and StreamPiper objects
         systemOut = Pipe.open();
         systemOut.source().configureBlocking(false);
-        spawnOutToSystemOut = new StreamPiper(System.out,
+        spawnOutToSystemOut = new StreamPiper(echo ? System.out : null,
                                               spawnable.getStdout(),
                                               Channels.newOutputStream(systemOut.sink()));
         spawnOutToSystemOut.start();
@@ -150,7 +145,7 @@ implements TimerEventListener
             systemErr = Pipe.open();
             systemErr.source().configureBlocking(false);
 
-            spawnErrToSystemErr = new StreamPiper(System.err,
+            spawnErrToSystemErr = new StreamPiper(echo ? System.err : null,
                                                   spawnable.getStderr(),
                                                   Channels.newOutputStream(systemErr.sink()));
             spawnErrToSystemErr.start();

@@ -1,6 +1,9 @@
 package expectj;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -10,9 +13,6 @@ import java.nio.channels.Pipe;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Date;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is used for talking to processes / ports. This will also interact
@@ -82,14 +82,14 @@ public class Spawn {
      * @param lDefaultTimeOutSeconds Default timeout for expect commands
      * @throws IOException on trouble launching the spawn
      */
-    Spawn(Spawnable spawn, long lDefaultTimeOutSeconds) throws IOException {
+    Spawn(Spawnable spawn, long lDefaultTimeOutSeconds, boolean echo) throws IOException {
         if (lDefaultTimeOutSeconds < -1) {
             throw new IllegalArgumentException("Timeout must be >= -1, was "
                                                + lDefaultTimeOutSeconds);
         }
         m_lDefaultTimeOutSeconds = lDefaultTimeOutSeconds;
 
-        slave = new SpawnableHelper(spawn, lDefaultTimeOutSeconds);
+        slave = new SpawnableHelper(spawn, lDefaultTimeOutSeconds, echo);
         slave.start();
         LOG.debug("Spawned Process: " + spawn);
 
